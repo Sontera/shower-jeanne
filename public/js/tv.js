@@ -73,6 +73,10 @@ function renderPlayersColumn(connectedPlayers) {
   for (const player of PLAYERS) {
     if (!players.includes(player.id)) continue;
     const token = createToken(player, 'neutral', { size: 'tv' });
+    // Pré-insérer le badge (invisible) pour réserver l'espace
+    const badge = document.createElement('span');
+    badge.className = 'token-vote-badge';
+    token.insertBefore(badge, token.querySelector('.token-avatar'));
     playerTokens[player.id] = token;
     col.appendChild(token);
   }
@@ -112,6 +116,12 @@ function renderQuestion(questionIndex, totalQuestions) {
     const player = getPlayerById(id);
     if (player) updateTokenMood(tokenEl, player, 'neutral');
     tokenEl.dataset.voted = 'false';
+    // Reset le badge
+    const badge = tokenEl.querySelector('.token-vote-badge');
+    if (badge) {
+      badge.textContent = '';
+      badge.classList.remove('badge-correct', 'badge-wrong');
+    }
   }
 }
 
@@ -151,13 +161,12 @@ function renderReveal(questionIndex, results) {
       if (!tokenEl || !player) continue;
       updateTokenMood(tokenEl, player, result.correct ? 'happy' : 'sad');
 
-      // Afficher le choix du joueur à côté de son nom
-      let badge = tokenEl.querySelector('.token-vote-badge');
-      if (!badge) {
-        badge = document.createElement('span');
-        badge.className = 'token-vote-badge';
-        tokenEl.insertBefore(badge, tokenEl.querySelector('.token-avatar'));
-      }
+      // Enlever le point vert "a voté"
+      tokenEl.dataset.voted = 'false';
+
+      // Afficher la lettre de réponse dans le badge
+      const badge = tokenEl.querySelector('.token-vote-badge');
+      if (!badge) continue;
       const voteText = result.vote || '—';
       badge.textContent = voteText;
       badge.classList.toggle('badge-correct', result.correct);

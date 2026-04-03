@@ -32,13 +32,10 @@ body {
 /* Bulles bébés décoratifs */
 .lobby-bubble {
   position: absolute;
-  width: 280px;
-  height: 280px;
+  width: 360px;
+  height: 360px;
   border-radius: 50%;
-  overflow: hidden;
-  opacity: 0.7;
-  filter: blur(0px);
-  box-shadow: 0 0 40px 20px rgba(255, 246, 240, 0.9);
+  overflow: visible;
 }
 
 .lobby-bubble img {
@@ -46,19 +43,19 @@ body {
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
-  mask-image: radial-gradient(circle, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 75%);
-  -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 75%);
+  mask-image: radial-gradient(circle, rgba(0,0,0,1) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0) 70%);
+  -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 35%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0) 70%);
 }
 
 .lobby-bubble-left {
-  left: 60px;
-  top: 50%;
+  left: 50px;
+  top: 38%;
   transform: translateY(-50%);
 }
 
 .lobby-bubble-right {
-  right: 60px;
-  top: 50%;
+  right: 50px;
+  top: 38%;
   transform: translateY(-50%);
 }
 
@@ -156,7 +153,7 @@ body {
 }
 .question-screen.active {
   display: grid;
-  grid-template-columns: 440px 1fr;
+  grid-template-columns: 500px 1fr;
 }
 
 /* Colonne gauche : joueurs */

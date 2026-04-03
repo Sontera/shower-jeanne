@@ -172,43 +172,69 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 36px;
+  width: 36px;
   height: 36px;
   border-radius: 10px;
   font-size: 1.1rem;
   font-weight: 800;
-  padding: 0 6px;
   flex-shrink: 0;
+  visibility: hidden;
+  background: transparent;
 }
 
 .player-token--tv .token-vote-badge {
-  min-width: 48px;
+  width: 48px;
   height: 48px;
   border-radius: 12px;
   font-size: 1.5rem;
 }
 
 .token-vote-badge.badge-correct {
+  visibility: visible;
   background: var(--correct);
   color: white;
 }
 
 .token-vote-badge.badge-wrong {
+  visibility: visible;
   background: var(--wrong);
   color: white;
 }
 
-/* A voté (attente de révélation) */
-.player-token[data-voted="true"]::after {
-  content: '';
-  display: block;
-  width: 12px;
-  height: 12px;
+/* A voté (attente de révélation) — point vert */
+.player-token[data-voted="true"] .token-vote-badge {
+  visibility: visible;
+  background: var(--correct);
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
   border-radius: 50%;
-  background: var(--accent);
-  margin-right: 8px;
-  flex-shrink: 0;
-  animation: pulse-dot 1.5s ease infinite;
+  font-size: 0;
+}
+
+.player-token--tv[data-voted="true"] .token-vote-badge {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+}
+
+/* Quand la réponse est révélée, le badge reprend sa taille normale */
+.player-token[data-voted="true"] .token-vote-badge.badge-correct,
+.player-token[data-voted="true"] .token-vote-badge.badge-wrong {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 10px;
+  font-size: 1.1rem;
+}
+
+.player-token--tv[data-voted="true"] .token-vote-badge.badge-correct,
+.player-token--tv[data-voted="true"] .token-vote-badge.badge-wrong {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  border-radius: 12px;
+  font-size: 1.5rem;
 }
 
 /* ============================================================
