@@ -201,15 +201,16 @@ engine.on('phase-change', (phase) => {
     renderVoteStatus();
     clearVotes();
   }
-  // Musique — commandes envoyées à la vue TV via Firebase
+  // Musique — commandes envoyées à la vue TV via Firebase (timestamp pour unicité)
+  const ts = Date.now();
   if (phase === 'round-intro') {
-    dbSet('music', { command: 'play-round', round: engine.currentRoundNumber });
+    dbSet('music', { command: 'play-round', round: engine.currentRoundNumber, ts });
   } else if (phase === 'reveal') {
-    dbSet('music', { command: 'reveal' });
+    dbSet('music', { command: 'reveal', ts });
   } else if (phase === 'final') {
-    dbSet('music', { command: 'final' });
+    dbSet('music', { command: 'final', ts });
   } else if (phase === 'scores' || phase === 'lobby') {
-    dbSet('music', { command: 'stop' });
+    dbSet('music', { command: 'stop', ts });
   }
   syncState();
 });

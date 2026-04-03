@@ -355,7 +355,7 @@ async function boot() {
   });
 
   // Écouter les commandes musicales de l'admin
-  let lastMusicCommand = null;
+  let lastMusicTs = null;
   dbListen('music', (music) => {
     if (!music) return;
 
@@ -363,10 +363,10 @@ async function boot() {
     if (music.volume != null) setVolume(music.muted ? 0 : music.volume);
     if (music.muted === true) setVolume(0);
 
-    // Commandes
+    // Commandes — timestamp unique pour chaque commande
+    if (music.ts === lastMusicTs) return;
+    lastMusicTs = music.ts;
     const cmd = music.command;
-    if (cmd === lastMusicCommand) return;
-    lastMusicCommand = cmd;
 
     switch (cmd) {
       case 'play-round':
