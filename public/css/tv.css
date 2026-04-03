@@ -101,6 +101,11 @@ body {
 
 .lobby-players .player-token {
   animation: fade-in 0.5s ease both;
+  width: 300px;
+}
+
+.lobby-players .token-name {
+  flex: 1;
 }
 
 .btn-enable-audio {
