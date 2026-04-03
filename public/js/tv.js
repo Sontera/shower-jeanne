@@ -384,7 +384,7 @@ async function boot() {
         break;
       case 'final':
         stopMusic();
-        playFile('assets/music/final.mp3', { loop: true });
+        playFile('assets/music/final.mp3');
         break;
       case 'jeopardy':
         stopMusic();

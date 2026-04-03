@@ -61,7 +61,7 @@ body {
   border: 3px solid var(--player-color, var(--border));
   border-radius: var(--token-radius);
   padding-left: 16px;
-  padding-right: 3px;
+  padding-right: 0;
   gap: 10px;
   transition: transform 0.35s, box-shadow 0.35s, border-color 0.35s, background 0.35s;
   cursor: default;
@@ -77,13 +77,14 @@ body {
 }
 
 .token-avatar {
-  width: var(--token-avatar-size);
-  height: var(--token-avatar-size);
+  width: calc(var(--token-avatar-size) + 2px);
+  height: calc(var(--token-avatar-size) + 2px);
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
   border: 3px solid var(--player-color, var(--border));
   background: var(--player-color, var(--bg-warm));
+  margin-right: -3px;
   transition: border-color 0.35s, box-shadow 0.4s;
 }
 
