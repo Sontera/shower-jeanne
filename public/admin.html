@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Quiz Shower de Bébé — Admin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,34 +11,27 @@
 </head>
 <body>
   <div class="admin-container">
-    <h1>Panneau Animateur</h1>
-    <p class="admin-subtitle">Contrôle du quiz — Charles</p>
-    <div class="phase-badge" id="phase-badge">chargement...</div>
+
+    <!-- Header compact -->
+    <div class="admin-header">
+      <span class="phase-badge" id="phase-badge">chargement...</span>
+      <span class="admin-title">Animateur</span>
+    </div>
 
     <!-- Config (lobby) -->
     <div id="panel-config" class="config-panel" style="display:none;">
       <h2>Joueurs</h2>
       <div class="player-list-admin" id="admin-player-list"></div>
-      <div style="margin-top:12px;">
-        <button class="btn btn-secondary" id="btn-connect-all">Connecter tous les joueurs (test)</button>
-      </div>
+      <button class="btn btn-secondary btn-full" id="btn-connect-all">Connecter tous les joueurs (test)</button>
     </div>
 
-    <!-- Contrôles en jeu -->
-    <div class="controls" id="controls">
-      <button class="btn btn-primary" id="btn-start">Lancer le quiz</button>
-      <button class="btn btn-primary" id="btn-reveal" disabled>Révéler la réponse</button>
-      <button class="btn btn-primary" id="btn-scores" disabled>Classement</button>
-      <button class="btn btn-primary" id="btn-next" disabled>Question suivante</button>
+    <!-- GROS BOUTONS d'action principaux -->
+    <div class="main-actions" id="controls">
+      <button class="btn btn-big btn-primary" id="btn-start">Lancer le quiz</button>
+      <button class="btn btn-big btn-primary" id="btn-reveal" disabled>Révéler la réponse</button>
+      <button class="btn btn-big btn-primary" id="btn-scores" disabled>Classement</button>
+      <button class="btn btn-big btn-primary" id="btn-next" disabled>Question suivante</button>
       <button class="btn btn-secondary" id="btn-back" disabled>Retour</button>
-    </div>
-
-    <!-- Outils -->
-    <div class="controls" id="test-controls" style="margin-top:0;">
-      <button class="btn btn-secondary" id="btn-random-votes" disabled>Simuler votes aléatoires</button>
-      <button class="btn btn-secondary" id="btn-jeopardy">Jeopardy</button>
-      <button class="btn btn-secondary" id="btn-mute">Mute musique</button>
-      <input type="range" id="volume-slider" min="0" max="100" value="35" style="width:100px;vertical-align:middle;">
     </div>
 
     <!-- Question en cours -->
@@ -54,14 +47,25 @@
     <div class="vote-status" id="vote-status" style="display:none;">
       <h3>Votes (<span id="vote-count">0</span>/<span id="player-count">0</span>)</h3>
       <div id="vote-list"></div>
-
     </div>
 
-    <!-- Actions toujours visibles -->
-    <div class="admin-bottom-actions" style="margin-top:24px; display:flex; gap:12px; flex-wrap:wrap;">
-      <button class="btn btn-secondary" id="btn-podium" disabled>Podium final</button>
-      <button class="btn btn-reset" id="btn-reset">Recommencer le quiz</button>
-    </div>
+    <!-- Outils secondaires (collapsible) -->
+    <details class="tools-section">
+      <summary>Outils</summary>
+      <div class="tools-content">
+        <button class="btn btn-secondary btn-full" id="btn-random-votes" disabled>Simuler votes aléatoires</button>
+        <div class="tools-row">
+          <button class="btn btn-secondary" id="btn-jeopardy">Jeopardy</button>
+          <button class="btn btn-secondary" id="btn-mute">Mute</button>
+          <input type="range" id="volume-slider" min="0" max="100" value="35">
+        </div>
+        <div class="tools-row">
+          <button class="btn btn-secondary" id="btn-podium" disabled>Podium final</button>
+          <button class="btn btn-reset" id="btn-reset">Recommencer</button>
+        </div>
+      </div>
+    </details>
+
   </div>
 
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>

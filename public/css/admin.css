@@ -1,81 +1,88 @@
-/* admin.css — Vue animateur (Chromebook, onglet 2) */
+/* admin.css — Vue animateur (mobile-first) */
 
 body {
   background: var(--bg);
+  -webkit-tap-highlight-color: transparent;
 }
 
 .admin-container {
-  max-width: 800px;
+  max-width: 600px;
   margin: 0 auto;
-  padding: 24px 20px;
+  padding: 12px 14px;
+  padding-bottom: 40px;
 }
 
-h1 {
-  font-size: 1.5rem;
-  color: var(--accent-dark);
-  margin-bottom: 4px;
+/* Header compact */
+.admin-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
 }
 
-.admin-subtitle {
+.admin-title {
+  font-size: 1.1rem;
+  font-weight: 700;
   color: var(--text-muted);
-  font-size: 0.9rem;
-  margin-bottom: 24px;
 }
 
-/* Phase indicator */
 .phase-badge {
   display: inline-block;
-  padding: 4px 14px;
+  padding: 4px 12px;
   border-radius: 12px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.8rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   background: var(--accent-light);
   color: var(--accent-dark);
-  margin-bottom: 20px;
 }
 
-/* Panneau de config (lobby) */
+/* Config (lobby) */
 .config-panel {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 20px;
+  padding: 16px;
+  margin-bottom: 14px;
 }
 
 .config-panel h2 {
-  font-size: 1.1rem;
-  margin-bottom: 12px;
+  font-size: 1rem;
+  margin-bottom: 10px;
 }
 
 .player-list-admin {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 8px;
+  margin-bottom: 10px;
 }
 
-/* Contrôles en jeu */
-.controls {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 24px;
-}
+/* ============================================================
+   BOUTONS
+   ============================================================ */
 
 .btn {
-  padding: 10px 24px;
+  padding: 10px 20px;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
+  font-family: var(--font);
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
+  transition: background 0.15s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .btn:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
+}
+
+.btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .btn-primary {
@@ -83,7 +90,7 @@ h1 {
   color: white;
 }
 
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
   background: var(--accent-dark);
 }
 
@@ -93,13 +100,12 @@ h1 {
   border: 1px solid var(--border);
 }
 
-.btn-secondary:hover {
+.btn-secondary:hover:not(:disabled) {
   background: var(--border);
 }
 
-.btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+.btn-full {
+  width: 100%;
 }
 
 .btn-reset {
@@ -113,91 +119,120 @@ h1 {
   background: #4a4a4a;
 }
 
-.q-position {
+/* Gros boutons d'action principale — pleine largeur sur mobile */
+.btn-big {
+  width: 100%;
+  padding: 16px 20px;
+  font-size: 1.2rem;
+  font-weight: 800;
+  border-radius: 14px;
+}
+
+.main-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+/* Cacher les boutons disabled qui ne sont pas pertinents */
+.main-actions .btn:disabled {
+  display: none;
+}
+
+/* Le bouton retour reste visible même disabled mais plus petit */
+.main-actions #btn-back {
+  display: block;
+  width: auto;
+  align-self: flex-start;
+  padding: 8px 20px;
   font-size: 0.9rem;
+}
+
+/* ============================================================
+   QUESTION
+   ============================================================ */
+
+.q-position {
+  font-size: 0.85rem;
   font-weight: 700;
   color: var(--accent);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
-/* Info question en cours */
 .current-question-info {
   background: var(--surface);
   border: 2px solid var(--accent);
   border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 20px;
-}
-
-.current-question-info h3 {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 10px;
+  padding: 16px;
+  margin-bottom: 14px;
 }
 
 .current-question-info .q-text {
-  font-size: 1.3rem;
+  font-size: 1.15rem;
   font-weight: 800;
   line-height: 1.4;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   color: var(--text);
 }
 
 .current-question-info .q-choices-list {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .current-question-info .q-choices-list p {
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 600;
-  padding: 4px 0;
+  padding: 3px 0;
   color: var(--text);
 }
 
 .current-question-info .q-answer {
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   color: var(--correct);
   font-weight: 800;
   background: var(--correct-light);
-  padding: 10px 14px;
+  padding: 10px 12px;
   border-radius: 8px;
   border-left: 4px solid var(--correct);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .current-question-info .q-explanation {
-  font-size: 1rem;
+  font-size: 0.95rem;
   line-height: 1.5;
   color: var(--text);
   background: var(--accent-light);
-  padding: 12px 14px;
+  padding: 10px 12px;
   border-radius: 8px;
   border-left: 4px solid var(--accent);
 }
 
-/* Statut des votes */
+/* ============================================================
+   VOTES
+   ============================================================ */
+
 .vote-status {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 20px;
+  padding: 14px;
+  margin-bottom: 14px;
 }
 
 .vote-status h3 {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: var(--text-muted);
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .vote-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 6px 0;
+  padding: 5px 0;
   border-bottom: 1px solid var(--border);
 }
 
@@ -205,22 +240,28 @@ h1 {
   border-bottom: none;
 }
 
+.vote-row span:first-child {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
 .vote-proxy-buttons {
   display: flex;
-  gap: 6px;
+  gap: 5px;
 }
 
 .vote-proxy-btn {
-  width: 34px;
-  height: 34px;
+  width: 38px;
+  height: 38px;
   border: 2px solid var(--border);
   border-radius: 8px;
   background: var(--surface);
   font-family: var(--font);
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .vote-proxy-btn:hover {
@@ -231,4 +272,44 @@ h1 {
   background: var(--accent);
   border-color: var(--accent);
   color: white;
+}
+
+/* ============================================================
+   OUTILS (collapsible)
+   ============================================================ */
+
+.tools-section {
+  margin-top: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.tools-section summary {
+  padding: 12px 16px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tools-content {
+  padding: 0 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tools-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.tools-row input[type="range"] {
+  flex: 1;
+  min-width: 80px;
 }
