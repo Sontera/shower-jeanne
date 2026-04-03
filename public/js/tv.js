@@ -51,11 +51,21 @@ function renderLobby(connectedPlayers) {
 function renderRoundIntro(questionIndex) {
   const q = QUESTIONS[questionIndex];
   if (!q) return;
-  document.getElementById('round-label').textContent = `Round ${q.round || '?'}`;
+  const roundNum = q.round || 1;
+  document.getElementById('round-label').textContent = `Round ${roundNum}`;
   document.getElementById('round-theme').textContent = q.theme || '';
-  // Count questions in this round
   const count = QUESTIONS.filter(qq => qq.round === q.round).length;
   document.getElementById('round-subtitle').textContent = `${count} questions`;
+
+  // Image du round
+  const imgContainer = document.getElementById('round-image');
+  imgContainer.innerHTML = '';
+  const img = document.createElement('img');
+  img.src = `assets/rounds/round-${roundNum}.jpg`;
+  img.alt = q.theme || '';
+  img.onerror = () => { imgContainer.style.display = 'none'; };
+  img.onload = () => { imgContainer.style.display = ''; };
+  imgContainer.appendChild(img);
 }
 
 // --- Question ---
