@@ -33,8 +33,10 @@ let currentVotes = {};
 function renderLobby(connectedPlayers) {
   const container = document.getElementById('lobby-players');
   container.innerHTML = '';
+  let cp = connectedPlayers || [];
+  if (!Array.isArray(cp)) cp = Object.values(cp);
   for (const player of PLAYERS) {
-    const isConnected = connectedPlayers && connectedPlayers.includes(player.id);
+    const isConnected = cp.includes(player.id);
     const token = createToken(player, 'neutral', { size: 'tv' });
     token.style.animationDelay = `${PLAYERS.indexOf(player) * 0.1}s`;
     if (isConnected) {
@@ -296,7 +298,11 @@ function onStateChange(state) {
       break;
 
     case 'reveal':
-      // Reveal animation triggered by revealResults listener
+      // Si la question n'a pas encore été rendue (ex: refresh pendant reveal)
+      if (lastPhase !== 'question' && lastPhase !== 'reveal') {
+        renderPlayersColumn(connectedPlayers);
+        renderQuestion(currentQuestion, totalQuestions);
+      }
       break;
 
     case 'scores': {

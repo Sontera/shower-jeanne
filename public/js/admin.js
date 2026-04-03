@@ -31,15 +31,20 @@ let _savedVolume = 0.35;
 
 // --- Sync engine → Firebase ---
 
+let _syncPending = false;
 function syncState() {
-  if (_restoring) return;
-  const state = engine.getState();
-  dbSet('state', {
-    phase: state.phase,
-    currentQuestion: state.currentQuestion,
-    scores: state.scores,
-    connectedPlayers: state.connectedPlayers,
-    totalQuestions: engine.totalQuestions,
+  if (_restoring || _syncPending) return;
+  _syncPending = true;
+  queueMicrotask(() => {
+    _syncPending = false;
+    const state = engine.getState();
+    dbSet('state', {
+      phase: state.phase,
+      currentQuestion: state.currentQuestion,
+      scores: state.scores,
+      connectedPlayers: state.connectedPlayers,
+      totalQuestions: engine.totalQuestions,
+    });
   });
 }
 
@@ -201,16 +206,20 @@ engine.on('phase-change', (phase) => {
     renderVoteStatus();
     clearVotes();
   }
-  // Musique — commandes envoyées à la vue TV via Firebase (timestamp pour unicité)
-  const ts = Date.now();
+  // Reset Jeopardy si actif
+  _musicPlaying = false;
+  btnJeopardy.textContent = 'Jeopardy';
+  // Musique — commandes envoyées à la vue TV via Firebase
+  const musicCmd = (cmd, extra = {}) =>
+    dbSet('music', { command: cmd, ts: Date.now(), volume: _savedVolume, muted: _muted, ...extra });
   if (phase === 'round-intro') {
-    dbSet('music', { command: 'play-round', round: engine.currentRoundNumber, ts });
+    musicCmd('play-round', { round: engine.currentRoundNumber });
   } else if (phase === 'reveal') {
-    dbSet('music', { command: 'reveal', ts });
+    musicCmd('reveal');
   } else if (phase === 'final') {
-    dbSet('music', { command: 'final', ts });
+    musicCmd('final');
   } else if (phase === 'scores' || phase === 'lobby') {
-    dbSet('music', { command: 'stop', ts });
+    musicCmd('stop');
   }
   syncState();
 });
@@ -345,7 +354,7 @@ async function restoreState() {
   engine._currentQuestion = savedState.currentQuestion || 0;
   engine._clearVotes();
 
-  if (savedVotes && savedState.phase === 'question') {
+  if (savedVotes && (savedState.phase === 'question' || savedState.phase === 'reveal')) {
     for (const [playerId, choice] of Object.entries(savedVotes)) {
       if (choice != null) engine._votes[playerId] = choice;
     }
@@ -387,10 +396,10 @@ btnReset.addEventListener('click', resetQuiz);
 btnJeopardy.addEventListener('click', () => {
   _musicPlaying = !_musicPlaying;
   if (_musicPlaying) {
-    dbSet('music', { command: 'jeopardy' });
+    dbSet('music', { command: 'jeopardy', ts: Date.now(), volume: _savedVolume, muted: _muted });
     btnJeopardy.textContent = 'Stop Jeopardy';
   } else {
-    dbSet('music', { command: 'stop' });
+    dbSet('music', { command: 'stop', ts: Date.now(), volume: _savedVolume, muted: _muted });
     btnJeopardy.textContent = 'Jeopardy';
   }
 });

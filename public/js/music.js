@@ -4,19 +4,14 @@
 //   round-1.mp3  à  round-8.mp3
 //   reveal.mp3   (optionnel — sting court à la révélation)
 //   final.mp3    (optionnel — musique du podium)
-//
-// La musique joue en boucle pendant le round-intro et les questions,
-// puis s'arrête en fade-out à la révélation.
-
-const FADE_DURATION = 1500; // ms
 
 let _audio = null;
+let _sting = null;
 let _fadeInterval = null;
 let _volume = 0.35;
 
 /**
  * Joue la musique du round donné. Boucle automatiquement.
- * @param {number} roundNumber - 1 à 8
  */
 export function playRoundMusic(roundNumber) {
   stop();
@@ -24,15 +19,11 @@ export function playRoundMusic(roundNumber) {
   _audio = new Audio(src);
   _audio.loop = true;
   _audio.volume = _volume;
-  _audio.play().catch(() => {
-    // Autoplay bloqué par le navigateur — ignoré silencieusement
-  });
+  _audio.play().catch(() => {});
 }
 
 /**
  * Joue un fichier audio arbitraire (remplace la musique en cours).
- * @param {string} src - chemin du fichier
- * @param {Object} options - { loop: false, onEnded: null }
  */
 export function playFile(src, options = {}) {
   stop();
@@ -42,24 +33,24 @@ export function playFile(src, options = {}) {
   if (options.onEnded) {
     _audio.addEventListener('ended', options.onEnded);
   }
-  const p = _audio.play();
-  if (p) p.catch(() => {});
+  _audio.play().catch(() => {});
 }
 
 /**
- * Joue un son court (reveal, final, etc.)
- * @param {string} name - nom du fichier sans extension (ex: 'reveal', 'final')
+ * Joue un son court (sting). Tracké pour pouvoir être stoppé.
  */
 export function playSting(name) {
-  const sting = new Audio(`assets/music/${name}.mp3`);
-  sting.volume = _volume;
-  sting.play().catch(() => {});
+  if (_sting) { _sting.pause(); _sting = null; }
+  _sting = new Audio(`assets/music/${name}.mp3`);
+  _sting.volume = _volume;
+  _sting.addEventListener('ended', () => { _sting = null; });
+  _sting.play().catch(() => {});
 }
 
 /**
  * Fade-out puis stop.
  */
-export function fadeOut(duration = FADE_DURATION) {
+export function fadeOut(duration = 1500) {
   if (!_audio) return;
   clearInterval(_fadeInterval);
   const step = 50;
@@ -74,7 +65,7 @@ export function fadeOut(duration = FADE_DURATION) {
 }
 
 /**
- * Stop immédiat.
+ * Stop immédiat (musique + sting).
  */
 export function stop() {
   clearInterval(_fadeInterval);
@@ -83,26 +74,25 @@ export function stop() {
     _audio.currentTime = 0;
     _audio = null;
   }
+  if (_sting) {
+    _sting.pause();
+    _sting = null;
+  }
 }
 
 /**
- * Change le volume (0 à 1).
+ * Change le volume (0 à 1). Affecte musique et sting.
  */
 export function setVolume(vol) {
   _volume = Math.max(0, Math.min(1, vol));
   if (_audio) _audio.volume = _volume;
+  if (_sting) _sting.volume = _volume;
 }
 
-/**
- * Retourne le volume courant.
- */
 export function getVolume() {
   return _volume;
 }
 
-/**
- * Musique en cours?
- */
 export function isPlaying() {
-  return _audio && !_audio.paused;
+  return (_audio && !_audio.paused) || (_sting && !_sting.paused);
 }

@@ -47,6 +47,7 @@ function renderJoinScreen() {
 
 async function joinAs(playerId) {
   myPlayerId = playerId;
+  localStorage.setItem('quizPlayerId', playerId);
   const player = getPlayerById(playerId);
   document.getElementById('my-name').textContent = player.name;
 
@@ -196,15 +197,30 @@ function onStateChange(state) {
 async function boot() {
   await initDB();
 
-  renderJoinScreen();
-  showPlayScreen('screen-join');
+  // Restaurer le joueur si déjà connecté (refresh du téléphone)
+  const savedId = localStorage.getItem('quizPlayerId');
+  if (savedId && getPlayerById(savedId)) {
+    joinAs(savedId);
+  } else {
+    renderJoinScreen();
+    showPlayScreen('screen-join');
+  }
 
   dbListen('state', onStateChange);
 
+  let _lastRevealResults = null;
   dbListen('state/revealResults', (results) => {
+    _lastRevealResults = results;
     if (results && currentState && myPlayerId) {
       renderResult(currentState.currentQuestion, results, currentState.scores);
       showPlayScreen('screen-result');
+    }
+  });
+
+  // Re-render les résultats quand les scores se mettent à jour (corrige le race condition)
+  dbListen('state/scores', (scores) => {
+    if (_lastRevealResults && currentState && myPlayerId && currentState.phase === 'reveal') {
+      renderResult(currentState.currentQuestion, _lastRevealResults, scores);
     }
   });
 }
