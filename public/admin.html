@@ -11,12 +11,15 @@
   <div class="admin-container">
     <h1>Panneau Animateur</h1>
     <p class="admin-subtitle">Contrôle du quiz — Charles</p>
-    <div class="phase-badge" id="phase-badge">lobby</div>
+    <div class="phase-badge" id="phase-badge">chargement...</div>
 
     <!-- Config (lobby) -->
-    <div id="panel-config" class="config-panel">
+    <div id="panel-config" class="config-panel" style="display:none;">
       <h2>Joueurs</h2>
       <div class="player-list-admin" id="admin-player-list"></div>
+      <div style="margin-top:12px;">
+        <button class="btn btn-secondary" id="btn-connect-all">Connecter tous les joueurs (test)</button>
+      </div>
     </div>
 
     <!-- Contrôles en jeu -->
@@ -26,6 +29,12 @@
       <button class="btn btn-primary" id="btn-scores" disabled>Classement</button>
       <button class="btn btn-primary" id="btn-next" disabled>Question suivante</button>
       <button class="btn btn-secondary" id="btn-back" disabled>Retour</button>
+    </div>
+
+    <!-- Outils de test -->
+    <div class="controls" id="test-controls" style="margin-top:0;">
+      <button class="btn btn-secondary" id="btn-random-votes" disabled>Simuler votes aléatoires</button>
+      <button class="btn btn-danger" id="btn-reset">Recommencer le quiz</button>
     </div>
 
     <!-- Question en cours -->

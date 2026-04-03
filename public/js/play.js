@@ -127,8 +127,6 @@ let lastPhase = null;
 let lastQuestionIndex = null;
 
 function onStateChange(state) {
-  console.log('[play] state reçu:', JSON.stringify(state));
-  console.log('[play] myPlayerId:', myPlayerId);
   if (!state) return;
   currentState = state;
   const { phase, currentQuestion, scores } = state;

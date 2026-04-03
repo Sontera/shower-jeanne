@@ -3,7 +3,7 @@
 import { PLAYERS, createToken, getPlayerById } from './players.js';
 import { QUESTIONS } from './questions.js';
 import { QuizEngine, getRanking } from './quiz-engine.js';
-import { initDB, dbSet, dbListen } from './db.js';
+import { initDB, dbSet, dbGet, dbListen } from './db.js';
 
 // --- Engine (seul l'admin en possède un) ---
 
@@ -17,23 +17,24 @@ const btnReveal = document.getElementById('btn-reveal');
 const btnScores = document.getElementById('btn-scores');
 const btnNext = document.getElementById('btn-next');
 const btnBack = document.getElementById('btn-back');
+const btnConnectAll = document.getElementById('btn-connect-all');
+const btnRandomVotes = document.getElementById('btn-random-votes');
+const btnReset = document.getElementById('btn-reset');
+
+// Flag pour éviter les boucles de sync pendant la restauration
+let _restoring = false;
 
 // --- Sync engine → Firebase ---
 
 function syncState() {
+  if (_restoring) return;
   const state = engine.getState();
-  const payload = {
+  dbSet('state', {
     phase: state.phase,
     currentQuestion: state.currentQuestion,
     scores: state.scores,
     connectedPlayers: state.connectedPlayers,
     totalQuestions: engine.totalQuestions,
-  };
-  console.log('[admin] syncState:', JSON.stringify(payload));
-  dbSet('state', payload).then(() => {
-    console.log('[admin] Firebase write OK');
-  }).catch(err => {
-    console.error('[admin] Firebase write FAILED:', err);
   });
 }
 
@@ -51,7 +52,9 @@ function renderPlayerList() {
   const list = document.getElementById('admin-player-list');
   list.innerHTML = '';
   for (const player of PLAYERS) {
+    const connected = engine.connectedPlayers.includes(player.id);
     const token = createToken(player, 'neutral', { size: 'admin' });
+    if (!connected) token.style.opacity = '0.4';
     list.appendChild(token);
   }
 }
@@ -64,6 +67,7 @@ function updateControls(phase) {
   btnScores.disabled = phase !== 'reveal';
   btnNext.disabled = phase !== 'scores';
   btnBack.disabled = phase === 'lobby' || phase === 'final';
+  btnRandomVotes.disabled = phase !== 'question';
 
   document.getElementById('panel-config').style.display =
     phase === 'lobby' ? 'block' : 'none';
@@ -146,6 +150,10 @@ engine.on('scores-update', () => {
   syncState();
 });
 
+engine.on('player-joined', () => {
+  renderPlayerList();
+});
+
 // --- Listen for votes from players (Firebase → engine) ---
 
 function listenForVotes() {
@@ -174,20 +182,52 @@ function listenForPlayers() {
   });
 }
 
-// --- Button handlers ---
+// --- Connecter tous les joueurs (test) ---
 
-btnStart.addEventListener('click', () => engine.startQuiz());
-btnReveal.addEventListener('click', () => engine.revealAnswer());
-btnScores.addEventListener('click', () => engine.showScores());
-btnNext.addEventListener('click', () => engine.nextQuestion());
-btnBack.addEventListener('click', () => engine.goBack());
+async function connectAllPlayers() {
+  for (const player of PLAYERS) {
+    await dbSet(`players/${player.id}`, true);
+    if (!engine.connectedPlayers.includes(player.id)) {
+      engine.connectPlayer(player.id);
+    }
+  }
+  renderPlayerList();
+  renderVoteStatus();
+  syncState();
+}
 
-// --- Boot ---
+// --- Simuler votes aléatoires ---
 
-async function boot() {
-  await initDB();
+async function simulateRandomVotes() {
+  if (engine.phase !== 'question') return;
+  const q = engine.currentQuestion;
+  if (!q) return;
 
-  // Reset Firebase state
+  const letters = q.choices.map(c => c.charAt(0));
+  for (const playerId of engine.connectedPlayers) {
+    if (engine.votes[playerId] != null) continue; // déjà voté
+    const randomChoice = letters[Math.floor(Math.random() * letters.length)];
+    await dbSet(`votes/${playerId}`, randomChoice);
+    engine.castVote(playerId, randomChoice);
+  }
+}
+
+// --- Reset quiz avec confirmation ---
+
+async function resetQuiz() {
+  if (!confirm('Recommencer le quiz depuis le début?\n\nTous les scores et le progrès seront perdus.')) {
+    return;
+  }
+
+  // Recréer un engine frais
+  engine.loadState({
+    phase: 'lobby',
+    currentQuestion: 0,
+    votes: {},
+    scores: {},
+    connectedPlayers: [],
+  });
+
   await dbSet('state', {
     phase: 'lobby',
     currentQuestion: 0,
@@ -196,10 +236,106 @@ async function boot() {
     totalQuestions: engine.totalQuestions,
   });
   await dbSet('votes', null);
+  await dbSet('state/revealResults', null);
   await dbSet('players', null);
 
   renderPlayerList();
   updateControls('lobby');
+}
+
+// --- Restaurer l'état depuis Firebase ---
+
+async function restoreState() {
+  const savedState = await dbGet('state');
+  const savedVotes = await dbGet('votes');
+
+  if (!savedState || !savedState.phase || savedState.phase === 'lobby') {
+    // Pas de partie en cours, on reste en lobby
+    updateControls('lobby');
+    renderPlayerList();
+    return false;
+  }
+
+  _restoring = true;
+
+  // Restaurer les joueurs connectés
+  // Firebase convertit les arrays en objets, il faut reconvertir
+  let connectedPlayers = savedState.connectedPlayers || [];
+  if (!Array.isArray(connectedPlayers)) {
+    connectedPlayers = Object.values(connectedPlayers);
+  }
+  for (const playerId of connectedPlayers) {
+    if (!engine.connectedPlayers.includes(playerId)) {
+      engine.connectPlayer(playerId);
+    }
+  }
+
+  // Restaurer les scores
+  if (savedState.scores) {
+    for (const [playerId, score] of Object.entries(savedState.scores)) {
+      engine._scores[playerId] = score;
+    }
+  }
+
+  // Restaurer la position dans le quiz
+  engine._currentQuestion = savedState.currentQuestion || 0;
+  engine._clearVotes();
+
+  // Restaurer les votes en cours si on est en phase question
+  if (savedVotes && savedState.phase === 'question') {
+    for (const [playerId, choice] of Object.entries(savedVotes)) {
+      if (choice != null) {
+        engine._votes[playerId] = choice;
+      }
+    }
+  }
+
+  // Restaurer la phase
+  engine._phase = savedState.phase;
+
+  _restoring = false;
+
+  // Mettre à jour l'UI
+  updateControls(engine.phase);
+  renderPlayerList();
+  if (engine.phase === 'question' || engine.phase === 'reveal') {
+    renderQuestionInfo();
+    renderVoteStatus();
+  }
+
+  console.log(`[admin] État restauré: phase=${engine.phase}, question=${engine.currentQuestionIndex + 1}/${engine.totalQuestions}`);
+  return true;
+}
+
+// --- Button handlers ---
+
+btnStart.addEventListener('click', () => engine.startQuiz());
+btnReveal.addEventListener('click', () => engine.revealAnswer());
+btnScores.addEventListener('click', () => engine.showScores());
+btnNext.addEventListener('click', () => engine.nextQuestion());
+btnBack.addEventListener('click', () => engine.goBack());
+btnConnectAll.addEventListener('click', connectAllPlayers);
+btnRandomVotes.addEventListener('click', simulateRandomVotes);
+btnReset.addEventListener('click', resetQuiz);
+
+// --- Boot ---
+
+async function boot() {
+  await initDB();
+
+  // Tenter de restaurer une partie en cours
+  const restored = await restoreState();
+
+  if (!restored) {
+    // Première session ou lobby — initialiser proprement
+    await dbSet('state', {
+      phase: 'lobby',
+      currentQuestion: 0,
+      scores: {},
+      connectedPlayers: [],
+      totalQuestions: engine.totalQuestions,
+    });
+  }
 
   listenForVotes();
   listenForPlayers();
