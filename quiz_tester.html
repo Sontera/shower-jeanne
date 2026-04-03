@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Shower de Bébé — Testeur de questions</title>
+<style>
+  :root {
+    --bg: #faf7f2;
+    --card: #fff;
+    --accent: #5b7fa5;
+    --accent-light: #e8eef4;
+    --correct: #4a9a6e;
+    --wrong: #c0564a;
+    --star-off: #d0d0d0;
+    --star-on: #e8a840;
+    --text: #2d2d2d;
+    --muted: #777;
+    --border: #e0dcd6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 20px;
+  }
+  h1 { font-size: 1.6rem; text-align: center; margin-bottom: 8px; }
+  .subtitle { text-align: center; color: var(--muted); font-size: 0.95rem; margin-bottom: 24px; }
+  .progress-bar {
+    background: var(--border);
+    border-radius: 6px;
+    height: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    background: var(--accent);
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.3s;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .theme-tag {
+    display: inline-block;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+  }
+  .q-number {
+    font-weight: 700;
+    color: var(--accent);
+    margin-right: 6px;
+  }
+  .q-text {
+    font-size: 1.15rem;
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+  .choices { list-style: none; }
+  .choices li {
+    padding: 14px 16px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 1.05rem;
+  }
+  .choices li:hover { border-color: var(--accent); background: var(--accent-light); }
+  .choices li.selected { border-color: var(--accent); background: var(--accent-light); font-weight: 600; }
+  .choices li.correct-reveal { border-color: var(--correct); background: #e8f5ed; }
+  .choices li.wrong-reveal { border-color: var(--wrong); background: #fceae8; }
+  .choices li.disabled { pointer-events: none; opacity: 0.85; }
+
+  .explanation {
+    background: #f5f8fb;
+    border-left: 4px solid var(--accent);
+    padding: 16px;
+    border-radius: 0 8px 8px 0;
+    margin: 16px 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+  .result-badge {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+  }
+  .result-badge.correct { background: #e8f5ed; color: var(--correct); }
+  .result-badge.wrong { background: #fceae8; color: var(--wrong); }
+  .result-badge.skipped { background: #f0f0f0; color: var(--muted); }
+
+  /* Star rating */
+  .rating-section { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+  .rating-label { font-weight: 600; margin-bottom: 8px; font-size: 0.95rem; }
+  .rating-desc { font-size: 0.82rem; color: var(--muted); margin-bottom: 10px; }
+  .stars { display: flex; gap: 6px; margin-bottom: 6px; }
+  .star {
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--star-off);
+    transition: color 0.1s;
+    user-select: none;
+    line-height: 1;
+  }
+  .star.active { color: var(--star-on); }
+  .star:hover { color: var(--star-on); }
+  .rating-text { font-size: 0.82rem; color: var(--muted); min-height: 1.2em; }
+
+  /* Buttons */
+  .btn-row { display: flex; gap: 12px; justify-content: space-between; margin-top: 16px; }
+  .btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover:not(:disabled) { background: #4a6d90; }
+  .btn-secondary { background: var(--border); color: var(--text); }
+  .btn-secondary:hover:not(:disabled) { background: #d0ccc6; }
+  .btn-skip { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .btn-skip:hover { background: #f5f5f5; }
+  .btn-export { background: var(--correct); color: #fff; }
+  .btn-export:hover { background: #3d8a5e; }
+
+  /* Summary */
+  .summary-header { text-align: center; margin-bottom: 24px; }
+  .summary-score { font-size: 2rem; font-weight: 700; color: var(--accent); }
+  .summary-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  .summary-table th { text-align: left; padding: 8px; border-bottom: 2px solid var(--border); font-size: 0.8rem; color: var(--muted); text-transform: uppercase; }
+  .summary-table td { padding: 8px; border-bottom: 1px solid var(--border); }
+  .summary-table tr:hover { background: #faf8f4; }
+  .star-small { color: var(--star-on); font-size: 0.9rem; }
+  .star-small.off { color: var(--star-off); }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+  .dot.c { background: var(--correct); }
+  .dot.w { background: var(--wrong); }
+  .dot.s { background: var(--muted); }
+
+  .hidden { display: none; }
+  .counter { text-align: center; color: var(--muted); font-size: 0.85rem; margin-bottom: 4px; }
+
+  /* Persistent bottom bar */
+  .bottom-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--card); border-top: 1px solid var(--border);
+    padding: 8px 16px; display: flex; align-items: center;
+    justify-content: center; gap: 16px; z-index: 100;
+    font-size: 0.85rem; box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+  }
+  .bottom-bar .bar-status { color: var(--muted); }
+  .bottom-bar .bar-status strong { color: var(--text); }
+  .bottom-bar .btn-bar-dl {
+    background: var(--correct); color: #fff; border: none; border-radius: 6px;
+    padding: 6px 14px; font-size: 0.82rem; font-weight: 600; cursor: pointer;
+  }
+  .bottom-bar .btn-bar-dl:hover { background: #3d8a5e; }
+  body { padding-bottom: 52px; }
+
+  /* Start screen */
+  .start-screen { text-align: center; padding: 40px 20px; }
+  .start-screen h1 { font-size: 2rem; margin-bottom: 12px; }
+  .start-screen p { color: var(--muted); margin-bottom: 24px; max-width: 480px; margin-left: auto; margin-right: auto; }
+  .stat-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 32px; }
+  .stat { text-align: center; }
+  .stat-num { font-size: 1.8rem; font-weight: 700; color: var(--accent); display: block; }
+  .stat-label { font-size: 0.82rem; color: var(--muted); }
+
+  .filter-section { text-align: left; margin-bottom: 24px; }
+  .filter-section h3 { font-size: 1rem; margin-bottom: 8px; }
+  .theme-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .theme-chip {
+    padding: 6px 12px; border-radius: 20px; font-size: 0.82rem;
+    border: 1px solid var(--border); cursor: pointer; transition: all 0.15s;
+    user-select: none; background: var(--card);
+  }
+  .theme-chip.active { background: var(--accent-light); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .theme-chip:hover { border-color: var(--accent); }
+  .chip-count { font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="container" id="app"></div>
+<div class="bottom-bar hidden" id="bottom-bar">
+  <span class="bar-status" id="bar-status"></span>
+  <button class="btn-bar-dl" id="bar-dl">Telecharger .md</button>
+</div>
+
+<script>
+// ============================================================
+// QUIZ DATA — parsed from quiz_shower_bebe.md
+// ============================================================
+const themes = [
+  "Bébés d'époques passées",
+  "Traditions internationales étranges",
+  "Impacts de la parentalité",
+  "Méthodes d'éducation",
+  "Biologie et développement",
+  "Mythes vs science",
+  "Records et statistiques",
+  "Grossesse dans le règne animal",
+  "Technologie et parentalité moderne",
+  "Prénoms et traditions de nommage",
+  "La vraie vie des parents québécois",
+  "Génie biomédical et bébés",
+  "Section spéciale futur papa"
+];
+
+const questions = [
+  // Theme 0: Bébés d'époques passées
+  {id:1, theme:0, text:"Au Moyen Âge en Europe, les bébés étaient emmaillotés très serré pendant des mois. Pourquoi les parents faisaient-ils cela?", choices:["Pour les garder au chaud la nuit","Pour que leurs membres poussent bien droits","Pour empêcher les rats de les mordre","Pour qu'ils dorment face vers le haut"], answer:"B", explanation:"Pour que leurs membres poussent bien droits. Le médecin grec Soranus d'Éphèse recommandait déjà cette pratique au 2e siècle. On croyait que sans emmaillotage serré, les membres se déformeraient."},
+  {id:2, theme:0, text:"Au Moyen Âge, que faisaient parfois les parents européens avec leur bébé emmailloté pendant qu'ils travaillaient?", choices:["Ils les attachaient sur le dos d'un chien","Ils les suspendaient au mur sur un crochet","Ils les plaçaient dans un seau d'eau tiède","Ils les enterraient à moitié dans le sable"], answer:"B", explanation:"Ils les suspendaient au mur sur un crochet. Les bébés emmaillotés étaient parfois accrochés à des crochets pour les garder en sécurité et loin des animaux pendant que les parents travaillaient."},
+  {id:3, theme:0, text:"Au début du 20e siècle, quel produit aujourd'hui controversé était couramment recommandé par des médecins pour « calmer » les bébés qui font leurs dents?", choices:["Du whisky sur les gencives","De l'huile de ricin","Du jus de citron dilué","De la poudre de charbon"], answer:"A", explanation:"Du whisky sur les gencives. Des sirops calmants contenant de l'alcool ou des opiacés (comme le Mrs. Winslow's Soothing Syrup) étaient vendus librement et recommandés par des médecins jusqu'au début du 20e siècle."},
+  {id:4, theme:0, text:"L'emmaillotage est une pratique qui remonte à environ combien d'années?", choices:["1 000 ans","2 500 ans","4 000 à 5 000 ans","10 000 ans"], answer:"C", explanation:"4 000 à 5 000 ans. Les plus anciennes représentations de bébés emmaillotés datent de Crète et Chypre, il y a environ 4 000 à 4 500 ans. Certains chercheurs pensent que la pratique pourrait remonter au Paléolithique."},
+  {id:5, theme:0, text:"En Europe, la pratique de l'emmaillotage serré a commencé à être abandonnée à quelle époque?", choices:["Au 5e siècle (chute de Rome)","Au 12e siècle (croisades)","Au 17e-18e siècle (Lumières)","Au début du 20e siècle"], answer:"C", explanation:"Au 17e-18e siècle (Lumières). L'emmaillotage restrictif a graduellement décliné en Europe au cours de cette période, influencé par les idées des Lumières sur la liberté et le développement naturel."},
+  {id:6, theme:0, text:"Quel philosophe célèbre a joué un rôle important dans la remise en question de l'emmaillotage en argumentant que les bébés avaient besoin de liberté de mouvement?", choices:["Voltaire","Jean-Jacques Rousseau","John Locke","René Descartes"], answer:"B", explanation:"Jean-Jacques Rousseau. Dans Émile, ou De l'éducation (1762), Rousseau a argumenté que les bébés avaient besoin de liberté pour bouger et se développer naturellement, contribuant au déclin de l'emmaillotage serré."},
+  {id:7, theme:0, text:"Avant l'invention du biberon en verre au 19e siècle, quel objet était couramment utilisé pour nourrir les bébés qui ne pouvaient pas être allaités?", choices:["Une corne d'animal percée","Un gant en cuir imbibé de lait","Un tube en plomb","Une éponge attachée à un bâton"], answer:"A", explanation:"Une corne d'animal percée. Des cornes de vache ou de chèvre avec un petit trou au bout étaient utilisées depuis l'Antiquité comme biberon de fortune."},
+
+  // Theme 1: Traditions internationales étranges
+  {id:8, theme:1, text:"Au Japon, on organise chaque année un concours appelé nakizumo. En quoi consiste-t-il?", choices:["Une course de bébés à quatre pattes","Un concours du plus beau bébé","Un concours où le premier bébé à pleurer gagne","Un concours de lancer de couches"], answer:"C", explanation:"Un concours où le premier bébé à pleurer gagne. Le nakizumo est une tradition japonaise où des bébés d'environ 1 an sont mis face à face. Le premier à pleurer — ou le plus bruyant — est déclaré gagnant, car les pleurs sont un signe de bonne santé."},
+  {id:9, theme:1, text:"À Bali, en Indonésie, les bébés ne doivent pas toucher le sol pendant combien de temps après la naissance?", choices:["1 semaine","1 mois","3 mois","6 mois"], answer:"C", explanation:"3 mois. Les Balinais croient que le nouveau-né est encore lié au monde spirituel. Pendant 3 mois, il doit être porté en tout temps. Une cérémonie appelée Nyambutin marque le moment où ses pieds touchent la terre pour la première fois."},
+  {id:10, theme:1, text:"En Finlande, le gouvernement offre depuis les années 1930 un cadeau à chaque nouveau parent. De quoi s'agit-il?", choices:["Un bon de 500 € pour des vêtements","Une boîte en carton contenant ~60 articles essentiels pour bébé","Un abonnement d'un an à un service de garde","Un arbre planté au nom de l'enfant"], answer:"B", explanation:"Une boîte en carton contenant ~60 articles essentiels pour bébé. La « baby box » finlandaise contient vêtements, jouets, couvertures et articles de soins. La boîte elle-même sert de premier lit."},
+  {id:11, theme:1, text:"En Bulgarie, quand quelqu'un voit un beau bébé, quelle est la tradition?", choices:["On lui donne une pièce de monnaie","On fait semblant que le bébé est laid","On lui chante une berceuse","On touche ses pieds trois fois"], answer:"B", explanation:"On fait semblant que le bébé est laid. Les Bulgares croient que complimenter un bébé attire l'attention du diable, qui pourrait lui faire du mal. On prétend donc que le bébé est laid pour le protéger."},
+  {id:12, theme:1, text:"En Chine, la tradition du zuo yuezi demande à la nouvelle mère de rester en confinement pendant combien de temps après l'accouchement?", choices:["1 semaine","30 jours","3 mois","6 mois"], answer:"B", explanation:"30 jours. Le zuo yuezi (« s'asseoir le mois ») est une tradition chinoise millénaire. La mère ne doit pas quitter la maison, ni prendre de douche, ni manger de fruits crus pendant cette période."},
+  {id:13, theme:1, text:"Au Nigéria, dans la culture Igbo, qui donne traditionnellement le premier bain au bébé et pourquoi?", choices:["Le père, pour montrer son engagement","La grand-mère, pour symboliser que la mère ne sera pas seule","L'aîné de la famille, pour transmettre sa sagesse","Un guérisseur, pour bénir l'enfant"], answer:"B", explanation:"La grand-mère, pour symboliser que la mère ne sera pas seule. Dans la tradition igbo (omugwo), la grand-mère vient s'installer chez les nouveaux parents pour aider avec les tâches ménagères, les soins du bébé et offrir des massages à la nouvelle maman."},
+  {id:14, theme:1, text:"En Allemagne, la fête traditionnelle après la naissance s'appelle Babypinkeln (littéralement « pipi de bébé »). Historiquement, qu'est-ce qui portait chance?", choices:["Verser de la bière sur la tête du bébé","Que le bébé nu urine sur quelqu'un","Faire pipi dans la rivière la plus proche","Offrir un pot de chambre en argent"], answer:"B", explanation:"Que le bébé nu urine sur quelqu'un. Le Babypinkeln est une fête pour accueillir le nouveau-né. Historiquement, le bébé nu était passé de bras en bras et la personne sur qui il urinait était considérée comme bénie par la chance éternelle."},
+
+  // Theme 2: Impacts de la parentalité
+  {id:15, theme:2, text:"Selon Statistique Canada, combien coûte en moyenne élever un enfant de la naissance à 17 ans dans une famille à revenu moyen (2 parents, 2 enfants)?", choices:["~150 000 $","~293 000 $","~425 000 $","~550 000 $"], answer:"B", explanation:"~293 000 $. Statistique Canada estime le coût à environ 293 000 $ CA (soit ~17 235 $ par année en moyenne). Ce montant exclut les études postsecondaires."},
+  {id:16, theme:2, text:"Quelle est la catégorie de dépense la plus importante pour élever un enfant au Canada?", choices:["La nourriture","Les vêtements","Le logement","La garde d'enfants"], answer:"C", explanation:"Le logement. Le logement représente environ 27 à 32 % du coût total d'élever un enfant. Le transport arrive deuxième, suivi de la nourriture."},
+  {id:17, theme:2, text:"Au Canada, quel est le montant maximum annuel de la Prestation canadienne pour enfants (PCE) pour un enfant de moins de 6 ans (période 2025-2026)?", choices:["~4 200 $","~5 900 $","~7 997 $","~10 500 $"], answer:"C", explanation:"~7 997 $. Pour la période de juillet 2025 à juin 2026, le maximum est de 7 997 $ par année (666,41 $/mois) pour les enfants de moins de 6 ans."},
+  {id:18, theme:2, text:"De combien le coût total d'élever un enfant augmente-t-il si l'enfant reste à la maison jusqu'à 22 ans (au lieu de 17)?", choices:["~10 %","~29 %","~45 %","~60 %"], answer:"B", explanation:"~29 %. Si les enfants restent au domicile familial entre 18 et 22 ans, le coût total augmente de près de 29 % par rapport à l'estimation de base (naissance à 17 ans)."},
+  {id:19, theme:2, text:"En 2025, quel pourcentage des enfants canadiens de 0 à 5 ans fréquentent une forme de service de garde?", choices:["32 %","45 %","58 %","74 %"], answer:"C", explanation:"58 %. Selon Statistique Canada (2025), 58 % des enfants de 0 à 5 ans fréquentent une forme de service de garde au Canada."},
+  {id:20, theme:2, text:"Pour une famille canadienne élevant un enfant, quel poste de dépenses arrive en deuxième après le logement?", choices:["La nourriture","Le transport","Les vêtements","L'éducation"], answer:"B", explanation:"Le transport. Pour les familles biparentales, le transport représente 18-20 % du coût total, devançant la nourriture (17-18 %)."},
+
+  // Theme 3: Méthodes d'éducation
+  {id:21, theme:3, text:"Dans les pays scandinaves, notamment en Suède et en Norvège, quelle pratique courante surprend souvent les visiteurs étrangers?", choices:["Les enfants apprennent à nager avant de marcher","Les bébés font la sieste dehors, même en hiver","Les parents ne donnent pas de nom avant 6 mois","Les enfants mangent seuls dès 4 mois"], answer:"B", explanation:"Les bébés font la sieste dehors, même en hiver. En Scandinavie, il est courant de laisser les bébés dormir dehors dans leur poussette même par temps froid. On croit que l'air frais renforce le système immunitaire et améliore le sommeil."},
+  {id:22, theme:3, text:"En Chine, les bébés portent traditionnellement un vêtement spécial pour faciliter l'apprentissage de la propreté sans couches. Comment s'appelle-t-il?", choices:["Le haoyi","Le kaidangku (pantalon fendu)","Le xiaoku","Le fengyi"], answer:"B", explanation:"Le kaidangku (pantalon fendu). Les « split pants » sont des pantalons avec une ouverture à l'entrejambe. Les parents utilisent un sifflement spécifique pour inciter le bébé à faire ses besoins au bon moment."},
+  {id:23, theme:3, text:"Au Québec, le système de garderies à contribution réduite coûte combien par jour (tarif de base)?", choices:["5,75 $/jour","8,85 $/jour","9,10 $/jour","12,50 $/jour"], answer:"C", explanation:"9,10 $/jour. Le tarif de base des places à contribution réduite au Québec est d'environ 9,10 $ par jour — un des systèmes les plus abordables au Canada."},
+  {id:24, theme:3, text:"En Corée du Sud, qui joue traditionnellement un rôle central dans la salle d'accouchement?", choices:["Le père","La belle-mère","Un moine bouddhiste","Une sage-femme de quartier"], answer:"B", explanation:"La belle-mère. En Corée du Sud, la belle-mère (mère du mari) joue traditionnellement un rôle actif pendant l'accouchement. Le père restait historiquement hors de la salle."},
+  {id:25, theme:3, text:"Quelle est la durée du congé de maternité payé en Bulgarie, un des plus généreux au monde?", choices:["6 mois","1 an","2 ans","3 ans"], answer:"C", explanation:"2 ans. La Bulgarie offre 45 jours de congé payé avant la naissance, puis 2 ans de congé payé après — l'un des congés parentaux les plus généreux au monde."},
+  {id:26, theme:3, text:"Aux Pays-Bas, les femmes enceintes doivent récupérer un kraampakket avant la naissance. De quoi s'agit-il?", choices:["Un kit de fournitures médicales pour l'accouchement à domicile","Un panier de nourriture traditionnelle","Un certificat de naissance provisoire","Un carnet de vaccination prérempli"], answer:"A", explanation:"Un kit de fournitures médicales pour l'accouchement à domicile. Aux Pays-Bas, les accouchements à domicile sont courants (~20 %). Le kraampakket contient le matériel médical nécessaire."},
+  {id:27, theme:3, text:"Au Japon, la plupart des femmes accouchent sans anesthésie (épidurale). Cette tradition vient de quelle croyance?", choices:["La douleur stimule la production de lait","L'anesthésie affecte l'intelligence du bébé","La douleur prépare la mère aux défis de la maternité (croyance bouddhiste)","C'est une exigence légale"], answer:"C", explanation:"La douleur prépare la mère aux défis de la maternité (croyance bouddhiste). La plupart des Japonaises n'envisagent pas l'épidurale. Cette tradition vient de la croyance bouddhiste que les douleurs de l'accouchement sont un test préparatoire."},
+
+  // Theme 4: Biologie et développement
+  {id:28, theme:4, text:"Avec combien d'os un bébé naît-il, comparé aux 206 os d'un adulte?", choices:["~180","~220","~270","~300"], answer:"D", explanation:"~300. Un bébé naît avec environ 300 os. Plusieurs sont en cartilage et fusionnent ensemble au fil de la croissance, réduisant le nombre à 206 à l'âge adulte."},
+  {id:29, theme:4, text:"Les nouveau-nés pleurent, mais sans produire de vraies larmes. À partir de quel âge les larmes apparaissent-elles?", choices:["Dès la naissance","Environ 2 à 4 semaines","Environ 3 mois","Environ 6 mois"], answer:"B", explanation:"Environ 2 à 4 semaines. Les glandes lacrymales du nouveau-né ne produisent que le minimum pour lubrifier les yeux. Les vraies larmes n'apparaissent généralement qu'entre 2 semaines et 3 mois."},
+  {id:30, theme:4, text:"Quel « super-pouvoir » les bébés de moins de 6 mois possèdent-ils automatiquement?", choices:["Ils peuvent voir dans le noir","Ils retiennent instinctivement leur souffle sous l'eau","Ils peuvent distinguer toutes les couleurs","Ils peuvent supporter des températures extrêmes"], answer:"B", explanation:"Ils retiennent instinctivement leur souffle sous l'eau. Les nouveau-nés ont un réflexe de plongée : ils retiennent automatiquement leur souffle sous l'eau et leur rythme cardiaque ralentit. Cette capacité disparaît vers 6 mois."},
+  {id:31, theme:4, text:"Combien de papilles gustatives un nouveau-né possède-t-il environ?", choices:["~5 000 (comme un adulte)","~10 000","~20 000","~30 000"], answer:"D", explanation:"~30 000. Les bébés naissent avec environ 30 000 papilles gustatives — trois fois plus que les adultes! Elles se trouvent non seulement sur la langue, mais aussi sur le palais, les parois de la bouche et les amygdales."},
+  {id:32, theme:4, text:"À quelle distance un nouveau-né peut-il voir nettement?", choices:["2 à 5 cm","20 à 35 cm (8 à 14 pouces)","1 à 2 mètres","Il voit normalement dès la naissance"], answer:"B", explanation:"20 à 35 cm (8 à 14 pouces). C'est précisément la distance entre le visage du bébé et celui de sa mère pendant l'allaitement. Tout le reste est un flou de lumière et de formes."},
+  {id:33, theme:4, text:"Combien de réflexes un nouveau-né possède-t-il environ?", choices:["~10","~25","~70","~150"], answer:"C", explanation:"~70. Un nouveau-né possède environ 70 réflexes, dont le réflexe de Moro (sursaut), le réflexe de marche automatique, le réflexe de succion et le réflexe d'agrippement. La plupart disparaissent dans les premiers mois."},
+  {id:34, theme:4, text:"À quelle vitesse le cerveau d'un nouveau-né forme-t-il de nouvelles connexions neuronales dans les 3 premières années?", choices:["~1 000 par seconde","~100 000 par seconde","~1 million par seconde","~10 millions par seconde"], answer:"C", explanation:"~1 million par seconde. Le cerveau d'un bébé forme environ 1 million de nouvelles connexions neuronales par seconde pendant les 3 premières années de vie."},
+  {id:35, theme:4, text:"Les bébés possèdent une capacité unique que les adultes ont perdue. Laquelle?", choices:["Respirer et avaler en même temps","Voir les rayons ultraviolets","Entendre les ultrasons","Régénérer des bouts de doigts"], answer:"A", explanation:"Respirer et avaler en même temps. Grâce à la position élevée de leur larynx dans la gorge, les bébés peuvent téter et respirer simultanément. Cette capacité disparaît entre 3 et 6 mois, lorsque le larynx descend pour permettre le développement de la parole."},
+
+  // Theme 5: Mythes vs science
+  {id:36, theme:5, text:"VRAI ou FAUX : Une femme enceinte doit « manger pour deux » (doubler ses portions).", choices:["Vrai","Faux"], answer:"B", explanation:"Faux. Les besoins caloriques n'augmentent que d'environ 300 à 450 calories par jour au 2e et 3e trimestre — l'équivalent d'une collation santé."},
+  {id:37, theme:5, text:"VRAI ou FAUX : Faire écouter de la musique classique (Mozart) à un bébé le rend plus intelligent.", choices:["Vrai","Faux"], answer:"B", explanation:"Faux. L'« effet Mozart » est largement un mythe. L'étude originale de 1993 portait sur des adultes et montrait un effet temporaire de quelques minutes sur le raisonnement spatial."},
+  {id:38, theme:5, text:"VRAI ou FAUX : Les bébés peuvent goûter les saveurs des aliments que leur mère mange pendant la grossesse.", choices:["Vrai","Faux"], answer:"A", explanation:"Vrai. Les papilles gustatives se forment dès 13 semaines de gestation. Les saveurs des aliments de la mère passent dans le liquide amniotique."},
+  {id:39, theme:5, text:"VRAI ou FAUX : Les bébés sourient volontairement dès la naissance quand ils sont contents.", choices:["Vrai","Faux"], answer:"B", explanation:"Faux. Les premiers « sourires » d'un nouveau-né sont des réflexes ou causés par des gaz. Le vrai sourire social n'apparaît généralement qu'entre 6 et 8 semaines."},
+  {id:40, theme:5, text:"VRAI ou FAUX : Si la femme enceinte a beaucoup de brûlures d'estomac, le bébé aura beaucoup de cheveux.", choices:["Vrai","Faux"], answer:"B", explanation:"Faux (en grande partie). C'est le mythe de grossesse le plus populaire. Une petite étude de 2006 a trouvé une corrélation faible, mais la plupart des experts disent qu'il n'y a pas de lien direct."},
+  {id:41, theme:5, text:"VRAI ou FAUX : On peut deviner le sexe du bébé selon la position du ventre (haut = fille, bas = garçon).", choices:["Vrai","Faux"], answer:"B", explanation:"Faux. La façon dont une femme « porte » son bébé dépend de sa morphologie, de son tonus musculaire et de la position du bébé — pas de son sexe."},
+  {id:42, theme:5, text:"VRAI ou FAUX : Il est dangereux de prendre un bain pendant la grossesse.", choices:["Vrai","Faux"], answer:"B", explanation:"Faux. Prendre un bain est tout à fait sécuritaire pendant la grossesse. En revanche, les saunas et les bains à remous très chauds sont déconseillés."},
+  {id:43, theme:5, text:"VRAI ou FAUX : Les bébés reconnaissent des chansons qu'ils ont entendues dans le ventre de leur mère.", choices:["Vrai","Faux"], answer:"A", explanation:"Vrai. Selon une étude de l'Université d'Helsinki, les bébés reconnaissent des chansons entendues in utero jusqu'à 4 mois après la naissance."},
+
+  // Theme 6: Records et statistiques
+  {id:44, theme:6, text:"Combien de bébés naissent approximativement dans le monde chaque jour?", choices:["~100 000","~250 000","~385 000","~500 000"], answer:"C", explanation:"~385 000. Il naît environ 385 000 bébés par jour dans le monde, soit environ 267 par minute ou 4,4 par seconde."},
+  {id:45, theme:6, text:"Quel est le prénom le plus donné dans le monde, toutes cultures confondues?", choices:["Maria","Mohammed","Jean/John","Wei"], answer:"B", explanation:"Mohammed. Mohammed (et ses variantes orthographiques) est considéré comme le prénom le plus populaire au monde, porté par environ 150 millions de personnes."},
+  {id:46, theme:6, text:"Au Canada, quel mois de l'année voit naître le plus de bébés?", choices:["Janvier","Mai","Juillet","Septembre"], answer:"D", explanation:"Septembre. Statistiquement, septembre est le mois avec le plus de naissances au Canada — les conceptions de décembre/janvier pendant les Fêtes y étant pour quelque chose!"},
+  {id:47, theme:6, text:"Quel pourcentage des bébés naissent avec une forme de tache de naissance?", choices:["~20 %","~50 %","~80 %","~95 %"], answer:"C", explanation:"~80 %. Environ 80 % des bébés naissent avec une tache de naissance. La plupart disparaissent dans les premières années."},
+  {id:48, theme:6, text:"De combien un bébé moyen multiplie-t-il son poids de naissance au cours de sa première année?", choices:["Il double","Il triple","Il quadruple","Il quintuple"], answer:"B", explanation:"Il triple. Le bébé moyen double son poids vers 4-5 mois et le triple vers 12 mois, en plus de grandir d'environ 25 cm en un an."},
+  {id:49, theme:6, text:"Au Danemark, les parents doivent choisir le prénom de leur bébé à partir d'une liste officielle. Combien de prénoms contient-elle environ?", choices:["~500","~3 000","~7 000","~15 000"], answer:"C", explanation:"~7 000. Le Danemark possède une liste d'environ 7 000 prénoms préapprouvés. Si les parents veulent un prénom hors-liste, ils doivent obtenir l'approbation des autorités gouvernementales."},
+  {id:50, theme:6, text:"En Suède, des parents ont tenté en signe de protestation de nommer leur enfant « Brfxxccxxmnpcccclllmmnprxvclmnckssqlbb11116 ». Comment se prononce ce « prénom »?", choices:["Björk","Albin","Sven","Ça ne se prononce pas"], answer:"B", explanation:"Albin. En 1996, des parents suédois ont soumis ce « prénom » de 43 caractères en protestation contre la loi suédoise sur les prénoms. Il a été rejeté."},
+
+  // Theme 7: Grossesse dans le règne animal
+  {id:51, theme:7, text:"Quel mammifère terrestre détient le record de la plus longue gestation?", choices:["Le rhinocéros noir (~16 mois)","La girafe (~15 mois)","L'éléphant d'Afrique (~22 mois)","La baleine bleue (~12 mois)"], answer:"C", explanation:"L'éléphant d'Afrique (~22 mois). L'éléphant d'Afrique a la plus longue gestation de tous les mammifères terrestres : environ 22 mois."},
+  {id:52, theme:7, text:"Chez quel animal marin est-ce le mâle qui porte et « accouche » des bébés?", choices:["Le dauphin","Le poisson-clown","L'hippocampe","La pieuvre"], answer:"C", explanation:"L'hippocampe. La femelle dépose ses œufs dans une poche ventrale spéciale du mâle. Celui-ci les féconde, les porte pendant 2 à 4 semaines, puis « accouche » de centaines de petits."},
+  {id:53, theme:7, text:"Quand un bébé girafe naît, que lui arrive-t-il immédiatement?", choices:["Il est léché pendant 2 heures par sa mère","Il tombe d'environ 1,8 mètre (6 pieds) au sol","Il est caché dans les hautes herbes pendant 3 jours","Il est porté par le troupeau pendant une semaine"], answer:"B", explanation:"Il tombe d'environ 1,8 mètre (6 pieds) au sol. Les girafes accouchent debout. Le bébé tombe d'environ 1,8 m, ce qui provoque sa première respiration."},
+  {id:54, theme:7, text:"Quel animal a la période de « couvaison » la plus longue connue au monde — environ 4,5 ans?", choices:["L'albatros royal","Le requin à collerette","La pieuvre des profondeurs (Graneledone boreopacifica)","La tortue géante des Galápagos"], answer:"C", explanation:"La pieuvre des profondeurs (Graneledone boreopacifica). Une femelle a été observée couvant ses 160 œufs pendant 53 mois (4,5 ans) à 1 400 m de profondeur. Elle n'a pas mangé de tout ce temps et est morte après l'éclosion."},
+  {id:55, theme:7, text:"Chez l'opossum, combien de temps dure la gestation — une des plus courtes chez les mammifères?", choices:["~12 jours","~30 jours","~60 jours","~90 jours"], answer:"A", explanation:"~12 jours. L'opossum de Virginie a une des gestations les plus courtes chez les mammifères : seulement 12-13 jours."},
+  {id:56, theme:7, text:"Le requin à collerettes (Chlamydoselachus) a possiblement la plus longue gestation chez les vertébrés. Combien de temps?", choices:["~12 mois","~24 mois","~42 mois (3,5 ans)","~60 mois (5 ans)"], answer:"C", explanation:"~42 mois (3,5 ans). Le requin à collerettes est un requin vivipare aplacentaire des profondeurs. Ses embryons se développent pendant possiblement 3,5 ans — la plus longue gestation estimée chez les vertébrés."},
+  {id:57, theme:7, text:"Les kangourous ont une particularité unique pour gérer leur reproduction. Laquelle?", choices:["Ils peuvent suspendre le développement de l'embryon (diapause)","Ils pondent un œuf avant la naissance","Le mâle porte le bébé les premiers jours","La femelle peut porter des jumeaux de pères différents"], answer:"A", explanation:"Ils peuvent suspendre le développement de l'embryon (diapause). Les kangourous femelles peuvent mettre en pause le développement d'un embryon si les conditions ne sont pas favorables."},
+  {id:58, theme:7, text:"Combien pèse environ un bébé éléphant à la naissance?", choices:["~25 kg","~60 kg","~100 kg","~150 kg"], answer:"C", explanation:"~100 kg. Après 22 mois de gestation, un bébé éléphant naît pesant environ 100 kg (220 lb). Il peut se tenir debout dans l'heure suivant sa naissance."},
+
+  // Theme 8: Technologie et parentalité moderne
+  {id:59, theme:8, text:"En quelle décennie la première échographie obstétricale a-t-elle été réalisée, permettant de « voir » un bébé in utero?", choices:["Années 1930","Années 1950","Années 1970","Années 1990"], answer:"B", explanation:"Années 1950. Le Dr Ian Donald, à Glasgow, a réalisé les premières échographies obstétricales vers 1956-1958."},
+  {id:60, theme:8, text:"Avant l'invention des couches jetables modernes (années 1960), quel matériau était le plus couramment utilisé pour les couches?", choices:["De la mousse séchée","Des langes en coton/lin","De la peau d'animal","Des feuilles de maïs"], answer:"B", explanation:"Des langes en coton/lin. Les couches en tissu (coton ou lin) étaient la norme depuis des siècles."},
+  {id:61, theme:8, text:"Quelle marque a lancé la première couche jetable commerciale grand public en 1961?", choices:["Huggies","Pampers","Luvs","Gerber"], answer:"B", explanation:"Pampers. Pampers a été lancé par Procter & Gamble en 1961, inventé par l'ingénieur chimiste Victor Mills."},
+  {id:62, theme:8, text:"La première banque de lait maternel au monde a été fondée en quelle année?", choices:["1909","1942","1965","1988"], answer:"A", explanation:"1909. La première banque de lait maternel a été fondée à Vienne, en Autriche, en 1909."},
+  {id:63, theme:8, text:"Quel pays a introduit le concept du « Mutterpass » — un passeport médical de grossesse que la mère porte sur elle en tout temps?", choices:["La France","L'Allemagne","Le Japon","La Suisse"], answer:"B", explanation:"L'Allemagne. Le Mutterpass est un document allemand que chaque femme enceinte reçoit et porte sur elle."},
+  {id:64, theme:8, text:"Combien de couches un bébé moyen utilise-t-il environ pendant ses 2 premières années?", choices:["~2 000","~4 000","~6 000","~8 000"], answer:"C", explanation:"~6 000. Un bébé moyen utilise environ 6 000 à 8 000 couches dans ses 2 premières années."},
+
+  // Theme 9: Prénoms et traditions de nommage
+  {id:65, theme:9, text:"En Islande, les parents doivent respecter une règle stricte pour nommer leur enfant. Laquelle?", choices:["Le prénom doit commencer par la même lettre que celui du père","Le prénom doit être choisi parmi une liste officielle approuvée","Le prénom doit avoir exactement 4 syllabes ou moins","Le prénom doit avoir une signification liée à la nature"], answer:"B", explanation:"Le prénom doit être choisi parmi une liste officielle approuvée. L'Islande maintient un registre national des prénoms approuvés (~4 300 noms en 2023)."},
+  {id:66, theme:9, text:"En Allemagne, quelle contrainte importante existe-t-il pour le choix du prénom d'un enfant?", choices:["Le prénom doit être unisexe","Le prénom doit indiquer clairement le sexe de l'enfant","Le prénom ne doit pas dépasser 6 lettres","Le prénom doit être d'origine germanique"], answer:"B", explanation:"Le prénom doit indiquer clairement le sexe de l'enfant. Le Standesamt (bureau d'état civil) peut rejeter un prénom s'il ne permet pas de déterminer le sexe."},
+  {id:67, theme:9, text:"Chez les Navajos (peuple autochtone d'Amérique du Nord), quel événement du bébé donne lieu à une grande fête?", choices:["Son premier mot","Sa première dent","Son premier rire","Son premier pas"], answer:"C", explanation:"Son premier rire. Chez les Navajos, le premier rire d'un bébé marque sa transition du monde spirituel au monde physique. La personne qui fait rire le bébé pour la première fois est responsable d'organiser et de payer la fête!"},
+  {id:68, theme:9, text:"Au Portugal, quelle règle s'applique pour les prénoms de bébés?", choices:["Le prénom doit être celui d'un saint catholique","Le prénom doit être tiré d'une liste officielle et épelé en portugais","Le prénom ne peut pas avoir plus de 5 lettres","Le prénom doit être unique dans la municipalité"], answer:"B", explanation:"Le prénom doit être tiré d'une liste officielle et épelé en portugais. Les surnoms ou diminutifs ne sont pas acceptés."},
+  {id:69, theme:9, text:"En Islande, les noms de famille fonctionnent différemment de la plupart des pays. Comment?", choices:["On prend le nom de famille de la mère uniquement","Le nom de famille change à chaque génération (patronyme/matronyme)","Il n'y a pas de nom de famille du tout","On choisit un nouveau nom de famille à 18 ans"], answer:"B", explanation:"Le nom de famille change à chaque génération (patronyme/matronyme). Le fils d'Erik s'appelle Eriksson (fils d'Erik) et sa fille Eriksdóttir (fille d'Erik)."},
+  {id:70, theme:9, text:"Lequel de ces prénoms a été ACCEPTÉ par les autorités suédoises?", choices:["Metallica","Ikea","Superman","Lego"], answer:"D", explanation:"Lego. Les autorités suédoises ont accepté « Lego » comme prénom, ainsi que « Google » comme deuxième prénom. Par contre, Metallica, Ikea, Superman et Elvis ont tous été rejetés."},
+
+  // Theme 10: La vraie vie des parents québécois
+  {id:71, theme:10, text:"Selon une étude, combien d'heures de sommeil les nouveaux parents perdent-ils en moyenne par nuit pendant la première année?", choices:["~1 heure","~2 heures","~3 heures","~5 heures"], answer:"C", explanation:"~3 heures. Selon un sondage de Snuz auprès de 1 300 parents, 7 parents sur 10 perdent en moyenne 3 heures de sommeil par nuit la première année."},
+  {id:72, theme:10, text:"Selon une étude de l'Université de Warwick, combien de temps faut-il après la naissance du premier enfant pour que le sommeil des parents se rétablisse complètement?", choices:["1 an","2 ans","4 ans","6 ans"], answer:"D", explanation:"6 ans. Le sommeil des parents ne se rétablit pas complètement avant 6 ans après la naissance du premier enfant."},
+  {id:73, theme:10, text:"En 2019 au Canada, quel pourcentage des enfants de 1 à 17 ans avaient vécu la séparation ou le divorce de leurs parents?", choices:["8 %","18 %","28 %","38 %"], answer:"B", explanation:"18 %. En 2019, 18 % des enfants canadiens (environ 1 185 700 enfants) avaient vécu la séparation ou le divorce de leurs parents."},
+  {id:74, theme:10, text:"Selon les études, quel pourcentage des couples vivent une forte baisse de satisfaction conjugale dans les deux années suivant la naissance d'un enfant?", choices:["20 à 30 %","40 à 50 %","60 à 80 %","90 %+"], answer:"C", explanation:"60 à 80 %. Les recherches montrent que 60 à 80 % des couples vivent une forte insatisfaction conjugale dans les deux ans suivant la naissance."},
+  {id:75, theme:10, text:"Au Québec, quel pourcentage des jeunes adultes de 20 à 34 ans vivaient encore chez leurs parents (recensement 2016)?", choices:["~15 %","~30 %","~42 %","~55 %"], answer:"B", explanation:"~30 %. Au Québec, environ 30 % des jeunes adultes de 20-34 ans vivaient chez leurs parents en 2016. C'est nettement moins que l'Ontario (42 %)."},
+  {id:76, theme:10, text:"Combien de fois en moyenne les nouveaux parents sont-ils réveillés par leur bébé par nuit pendant la première année?", choices:["~1 fois","~3 fois","~5 fois","~8 fois"], answer:"B", explanation:"~3 fois. Les parents s'occupent de leur bébé environ 975 fois la nuit pendant la première année, soit près de 3 réveils par nuit en moyenne."},
+  {id:77, theme:10, text:"La dépression post-partum ne touche pas seulement les mères. Quel pourcentage des pères en sont aussi affectés?", choices:["~1 %","~5 %","~10 %","~25 %"], answer:"C", explanation:"~10 %. La dépression post-partum touche environ 1 homme sur 10 (8-10 %). Elle est souvent sous-diagnostiquée chez les pères."},
+  {id:78, theme:10, text:"Au Québec, les couples en union libre représentent une réalité distincte. Parmi les enfants québécois, environ quel pourcentage naissent de parents en union libre (non mariés)?", choices:["~25 %","~40 %","~63 %","~80 %"], answer:"C", explanation:"~63 %. Le Québec est unique : plus de 63 % des enfants y naissent de parents en union libre."},
+  {id:79, theme:10, text:"À 2 mois, quel pourcentage des bébés dorment au moins 5-6 heures d'affilée la nuit?", choices:["~5 %","~25 %","~50 %","~75 %"], answer:"B", explanation:"~25 %. À 2 mois, seulement 1 bébé sur 4 dort au moins 5-6 heures d'affilée la nuit. La plupart des bébés commencent à « faire leurs nuits » vers 4 mois."},
+  {id:80, theme:10, text:"Selon les démographes québécois, pour les couples en union libre avec enfants, la séparation survient en médiane quand l'enfant a quel âge?", choices:["Moins de 1 an","3 à 4 ans","7 ans","12 ans"], answer:"B", explanation:"3 à 4 ans. Selon la démographe Hélène Desrosiers de l'ISQ, la médiane des séparations pour les couples en union libre survient quand l'enfant a 3 ou 4 ans."},
+  {id:81, theme:10, text:"Les études montrent que la satisfaction conjugale revient en moyenne à son niveau d'avant bébé après combien de temps?", choices:["6 mois","1 an","2 ans","Jamais vraiment"], answer:"C", explanation:"2 ans. Il faut en moyenne 2 ans pour que la satisfaction conjugale revienne à son niveau d'avant la naissance."},
+  {id:82, theme:10, text:"Un bébé allaité se réveille typiquement aux combien d'heures pour boire dans les premières semaines?", choices:["Toutes les heures","Toutes les 2 heures","Toutes les 4 heures","Toutes les 6 heures"], answer:"B", explanation:"Toutes les 2 heures. Les bébés allaités se réveillent typiquement toutes les 2 heures car le lait maternel se digère plus rapidement que la formule."},
+  {id:83, theme:10, text:"Selon le psychologue Stanley Coren (UBC), les capacités cognitives d'un chien adulte moyen sont comparables à celles d'un enfant humain de quel âge?", choices:["6 mois","1 an","2 à 2,5 ans","5 ans"], answer:"C", explanation:"2 à 2,5 ans. Les capacités cognitives d'un chien moyen (vocabulaire ~165 mots) sont comparables à celles d'un enfant de 2 à 2,5 ans. Donc pendant ses 2 premières années, le bébé est techniquement moins futé que le chien."},
+  {id:84, theme:10, text:"Les cris d'un bébé peuvent atteindre quel niveau sonore en décibels?", choices:["70 dB (aspirateur)","85 dB (tondeuse à gazon)","100-120 dB (sirène d'ambulance / concert rock)","140 dB (décollage d'avion)"], answer:"C", explanation:"100-120 dB (sirène d'ambulance / concert rock). Les cris de bébés ont été mesurés entre 99 et 120 dB — comparable à une tronçonneuse ou un concert rock."},
+  {id:85, theme:10, text:"L'« amnésie infantile » fait que les adultes ne se souviennent généralement pas d'événements avant quel âge?", choices:["1 an","2-3 ans","3-4 ans","5-6 ans"], answer:"C", explanation:"3-4 ans. L'âge moyen du premier souvenir autobiographique se situe entre 3 et 3,5 ans."},
+  {id:86, theme:10, text:"« Baby Shark » (Bébé requin) est l'une des vidéos les plus regardées de l'histoire de YouTube. Combien de vues a-t-elle accumulées (en date de 2025)?", choices:["~2 milliards","~5 milliards","~8 milliards","~14 milliards"], answer:"D", explanation:"~14 milliards. « Baby Shark Dance » de Pinkfong est la vidéo la plus regardée de l'histoire de YouTube."},
+  {id:87, theme:10, text:"Combien de couches un parent change-t-il en moyenne pendant les 2,5 premières années de vie de son enfant?", choices:["~3 000","~6 000","~7 500","~12 000"], answer:"C", explanation:"~7 500. Sur 2,5 ans, ça totalise environ 6 000 à 8 000 couches (moyenne ~7 500). Empilées, ces couches feraient une tour d'environ 750 mètres."},
+  {id:88, theme:10, text:"Dans les sondages scientifiques menés aux États-Unis et en Allemagne, quel pourcentage de parents déclarent regretter d'avoir eu des enfants?", choices:["~1-2 %","~7-8 %","~20-25 %","~35 %"], answer:"B", explanation:"~7-8 %. Les sondages scientifiques situent le taux de regret parental entre 7 et 8 %."},
+  {id:89, theme:10, text:"Les chercheurs ont documenté un phénomène appelé « l'effet Flynn inversé ». De quoi s'agit-il?", choices:["Les enfants apprennent à lire de plus en plus tôt","Le QI moyen des populations a commencé à diminuer dans plusieurs pays occidentaux","Les bébés naissent avec un cerveau plus gros qu'avant","L'intelligence émotionnelle des enfants a doublé en 50 ans"], answer:"B", explanation:"Le QI moyen des populations a commencé à diminuer dans plusieurs pays occidentaux. Depuis les années 1990-2000, des études montrent une inversion de la tendance d'augmentation continue du QI."},
+  {id:90, theme:10, text:"À partir de quel âge environ les premiers souvenirs d'un enfant commencent-ils à s'effacer de façon permanente (début de l'amnésie infantile)?", choices:["3 ans","5 ans","7 ans","10 ans"], answer:"C", explanation:"7 ans. C'est vers 7 ans que les premiers souvenirs de la petite enfance commencent à s'effacer de façon marquée."},
+  {id:91, theme:10, text:"Au Québec, la prévalence à vie du TDAH chez les jeunes de 1 à 24 ans est d'environ combien?", choices:["~3 %","~7 %","~11 %","~18 %"], answer:"C", explanation:"~11 %. Selon l'INSPQ, la prévalence s'établissait à 11,3 % en 2015-2016. Le Québec affiche l'un des taux de diagnostic les plus élevés au Canada."},
+  {id:92, theme:10, text:"Selon l'ISQ, en 2024, quel pourcentage des bébés nés au Québec avaient au moins un parent né à l'étranger?", choices:["~15 %","~25 %","~40 %","~55 %"], answer:"C", explanation:"~40 %. Selon le bilan démographique 2024 de l'ISQ, 40 % des bébés nés au Québec en 2024 avaient au moins un parent né à l'étranger."},
+  {id:101, theme:10, text:"Selon un sondage auprès de ~1 000 parents, la fréquence des rapports sexuels entre conjoints diminue en moyenne de combien après l'arrivée d'un enfant?", choices:["~15 %","~30 %","~50 % (environ la moitié)","~75 %"], answer:"C", explanation:"~50 %. La fréquence moyenne passait de 19 fois par mois avant l'enfant à 10 fois par mois après — une baisse d'environ 50 %."},
+  {id:110, theme:10, text:"Au Québec, en mai 2025, combien d'enfants étaient en attente d'une place en garderie (besoin immédiat)?", choices:["~5 000","~15 000","~31 000","~60 000"], answer:"C", explanation:"~31 000. Au 31 mai 2025, 30 688 enfants étaient en attente immédiate d'une place en service de garde au Québec."},
+  {id:111, theme:10, text:"Selon un sondage de l'organisme Ma place au travail (2025), quel pourcentage des familles québécoises rencontrent un délai entre la date souhaitée et l'obtention réelle d'une place en garderie?", choices:["~25 %","~50 %","~75 %","~90 %"], answer:"C", explanation:"~75 %. Selon un sondage de février 2025, 75 % des familles rencontrent un écart entre la date souhaitée et l'obtention réelle d'une place en garderie."},
+  {id:112, theme:10, text:"Au Québec, environ quel pourcentage des élèves du secondaire fréquentent une école privée?", choices:["~5 %","~10 %","~20 %","~35 %"], answer:"B", explanation:"~10 %. Environ 10 % de l'ensemble des élèves québécois fréquentent l'école privée. Dans la grande région de Montréal, le taux monte à ~20 % au secondaire."},
+  {id:113, theme:10, text:"Combien coûtent approximativement les frais de scolarité annuels d'une école privée subventionnée au secondaire au Québec?", choices:["~1 500 à 2 500 $","~3 000 à 5 200 $","~7 000 à 10 000 $","~12 000 à 15 000 $"], answer:"B", explanation:"~3 000 à 5 200 $. Les frais des écoles privées subventionnées sont plafonnés par le gouvernement à environ 5 200 $ par an."},
+  {id:114, theme:10, text:"Le taux de diplomation au secondaire au Québec est significativement différent entre le privé et le public. Quels sont les taux respectifs approximatifs?", choices:["Privé : 85 % / Public : 80 %","Privé : 93 % / Public : 77 %","Privé : 97 % / Public : 85 %","Privé : 99 % / Public : 90 %"], answer:"B", explanation:"Privé : 93 % / Public : 77 %. Attention au biais de sélection : les écoles privées sélectionnent souvent leurs élèves à l'entrée."},
+  {id:115, theme:10, text:"Les écoles privées au Québec reçoivent une subvention gouvernementale équivalente à quel pourcentage de la subvention par élève accordée aux écoles publiques?", choices:["0 % (aucune subvention)","~30 %","~60 %","~85 %"], answer:"C", explanation:"~60 %. Les écoles privées respectant les programmes du ministère reçoivent une subvention directe équivalente à 60 % de ce que reçoit un élève du public."},
+
+  // Theme 11: Génie biomédical et bébés
+  {id:93, theme:11, text:"L'incubateur pour bébés prématurés a été inventé grâce à l'observation de quel animal dans un zoo parisien?", choices:["Des singes dans leur habitat chauffé","Des poussins dans un incubateur à volaille","Des reptiles sous lampes chauffantes","Des oursons dans une tanière artificielle"], answer:"B", explanation:"Des poussins dans un incubateur à volaille. En 1878, l'obstétricien français Étienne Stéphane Tarnier a visité le zoo de Paris et a observé des couveuses utilisées pour réchauffer des poussins."},
+  {id:94, theme:11, text:"Au début du 20e siècle, le Dr Martin Couney a sauvé ~6 500 bébés prématurés aux États-Unis grâce à ses incubateurs. Où étaient installés ces incubateurs?", choices:["Dans les hôpitaux universitaires de New York","Dans des attractions de foire et parcs d'amusement (Coney Island)","Dans des trains médicaux ambulants","Dans des églises converties en cliniques"], answer:"B", explanation:"Dans des attractions de foire et parcs d'amusement (Coney Island). Martin Couney a exploité des « Infantoriums » dans des parcs d'amusement pendant plus de 40 ans (1903-1943)."},
+  {id:95, theme:11, text:"Comment Couney finançait-il les soins (gratuits pour les parents) de ses bébés prématurés à Coney Island?", choices:["Des dons de philanthropes new-yorkais","Des subventions gouvernementales","Les frais d'entrée de 25 cents payés par les visiteurs du spectacle","La vente de photographies des bébés"], answer:"C", explanation:"Les frais d'entrée de 25 cents payés par les visiteurs du spectacle. Couney n'a jamais facturé un centime aux parents et il est mort pratiquement fauché en 1950."},
+  {id:96, theme:11, text:"Le premier moniteur fœtal commercial (cardiotocographe) a été mis en marché en quelle année?", choices:["1938","1952","1968","1985"], answer:"C", explanation:"1968. Le Hewlett-Packard 8020A, premier moniteur fœtal commercial, a été mis en marché en 1968."},
+  {id:97, theme:11, text:"Avant l'invention du stéthoscope fœtal moderne, comment les médecins du 19e siècle écoutaient-ils le cœur du bébé in utero?", choices:["En collant directement leur oreille sur le ventre de la mère","En utilisant un cornet en bois (stéthoscope de Pinard)","En plaçant un verre à vin sur le ventre","A et B sont corrects"], answer:"D", explanation:"A et B sont corrects. Les médecins collaient leur oreille sur le ventre (décrit par Mayor en 1818). En 1895, Pinard a inventé son cornet en bois, utilisé universellement jusqu'au Doppler moderne."},
+  {id:98, theme:11, text:"Le surfactant pulmonaire synthétique, une des innovations les plus importantes en néonatalogie, permet de sauver les bébés prématurés. Quel problème résout-il?", choices:["L'insuffisance rénale du nouveau-né","L'incapacité des poumons immatures à rester ouverts entre les respirations","Les infections bactériennes contractées pendant l'accouchement","La régulation de la température corporelle"], answer:"B", explanation:"L'incapacité des poumons immatures à rester ouverts entre les respirations. Le surfactant synthétique, approuvé dans les années 1990, a révolutionné la néonatalogie."},
+  {id:99, theme:11, text:"En 1906, Cremer a réalisé une première mondiale en médecine fœtale. De quoi s'agissait-il?", choices:["La première photographie d'un fœtus in utero","La première mesure électronique d'un battement de cœur fœtal","La première transfusion sanguine in utero","La première chirurgie fœtale"], answer:"B", explanation:"La première mesure électronique d'un battement de cœur fœtal. En 1906, Cremer a réussi à capter électroniquement le signal cardiaque d'un fœtus."},
+  {id:100, theme:11, text:"Aujourd'hui, à partir de combien de semaines de gestation un bébé prématuré a-t-il une chance raisonnable de survie avec les soins intensifs néonatals modernes?", choices:["~18 semaines","~22-24 semaines","~28 semaines","~32 semaines"], answer:"B", explanation:"~22-24 semaines. La limite de viabilité est maintenant autour de 22-24 semaines dans les meilleurs centres. La survie à 22 semaines reste rare (~10-30 %)."},
+
+  // Theme 12: Section spéciale futur papa
+  {id:102, theme:12, text:"Dans l'utérus, le liquide amniotique et les tissus agissent comme un filtre acoustique naturel. Quel type de filtre audio cela imite-t-il?", choices:["Un filtre passe-haut (ne laisse passer que les aigus)","Un filtre passe-bas (ne laisse passer que les graves)","Un filtre passe-bande (ne laisse passer qu'une fréquence)","Aucun filtrage — le bébé entend tout normalement"], answer:"B", explanation:"Un filtre passe-bas. Le liquide amniotique et les tissus atténuent les hautes fréquences et laissent passer les basses. L'utérus est essentiellement le plus gros subwoofer biologique au monde."},
+  {id:103, theme:12, text:"Un bébé dans le ventre commence à entendre des sons vers 22-24 semaines. Quelles sont les premières fréquences qu'il perçoit?", choices:["Les basses fréquences (~250-500 Hz) — voix grave du papa, basse, battements de cœur","Les hautes fréquences (~4000-8000 Hz) — aigus, cymbales","Toutes les fréquences en même temps","Uniquement la voix de la mère"], answer:"A", explanation:"Les basses fréquences (~250-500 Hz). Les premières réponses auditives fœtales, vers 25-27 semaines, sont aux fréquences de 250 et 500 Hz."},
+  {id:104, theme:12, text:"Le bruit de fond constant que le bébé entend dans l'utérus (battements de cœur, flux sanguin, digestion) est à quel niveau sonore approximatif?", choices:["~20 dB (bibliothèque silencieuse)","~50 dB (conversation normale)","~75-90 dB (aspirateur / restaurant bruyant)","~110 dB (concert rock)"], answer:"C", explanation:"~75-90 dB. L'intérieur de l'utérus est étonnamment bruyant. C'est pourquoi le bruit blanc est si efficace pour calmer les nouveau-nés."},
+  {id:105, theme:12, text:"VRAI ou FAUX : Les bébés naissent avec une meilleure audition dans les très hautes fréquences (~19 000 Hz) que les adultes.", choices:["Vrai","Faux"], answer:"B", explanation:"Faux (ou presque vrai). À 19 000 Hz, les seuils sont comparables. Pour les fréquences moyennes (~10 000 Hz), les adultes entendent nettement mieux. L'audition des bébés ne devient comparable à celle des adultes qu'autour de 10 ans."},
+  {id:106, theme:12, text:"Au Québec, un siège d'auto pour enfant est obligatoire par la loi jusqu'à quel âge ou quelle taille?", choices:["Jusqu'à 4 ans","Jusqu'à 6 ans ou 63 cm en position assise","Jusqu'à 9 ans ou 145 cm","Jusqu'à 12 ans"], answer:"C", explanation:"Jusqu'à 9 ans ou 145 cm. Au Québec, la loi exige un siège d'auto jusqu'à ce que l'enfant ait 9 ans OU mesure 145 cm."},
+  {id:107, theme:12, text:"Combien de sièges d'auto différents un parent doit-il acheter en moyenne pour un enfant, de la naissance jusqu'à ce qu'il n'en ait plus besoin?", choices:["1 (un bon siège fait tout)","2-3 (coquille, puis convertible, puis d'appoint)","4-5","6+"], answer:"B", explanation:"2-3 sièges. La séquence typique est : coquille (0-12 mois), siège convertible (1-5 ans), puis siège d'appoint (5-9 ans). Le coût total moyen se situe entre 400 $ et 1 200 $."},
+  {id:108, theme:12, text:"Selon les études sur le sommeil des nouveaux pères, combien de minutes de sommeil en moins par nuit un père perd-il en moyenne après la naissance du premier enfant?", choices:["~13 minutes","~45 minutes","~90 minutes","~3 heures"], answer:"A", explanation:"~13 minutes. Les pères perdaient en moyenne seulement 13 minutes de sommeil par nuit — contre 62 minutes pour les mères. Le « je ne l'ai pas entendu pleurer » est statistiquement documenté."},
+  {id:109, theme:12, text:"Selon une étude de l'Université de Warwick, combien d'années après la naissance le sommeil des pères reste-t-il affecté?", choices:["6 mois","2 ans","4 ans","6 ans (et ils dorment encore 15 min de moins qu'avant)"], answer:"D", explanation:"6 ans (et ils dorment encore 15 min de moins qu'avant). Même 6 ans après la naissance, les pères dorment encore 15 minutes de moins par nuit. Le sommeil des parents ne revient jamais complètement."},
+];
+
+// ============================================================
+// APP STATE
+// ============================================================
+const letters = ["A","B","C","D"];
+const STORAGE_KEY = "quiz_shower_bebe_state";
+let activeQuestions = [];
+let currentIdx = 0;
+let phase = "question"; // "question" | "answer"
+let results = []; // {qId, theme, userAnswer, correct, rating}
+let selectedAnswer = null;
+let sessionStartTime = new Date().toISOString();
+
+const app = document.getElementById("app");
+const bottomBar = document.getElementById("bottom-bar");
+const barStatus = document.getElementById("bar-status");
+const barDl = document.getElementById("bar-dl");
+barDl.addEventListener("click", exportMd);
+
+// ============================================================
+// PERSISTENCE — save to localStorage after every answer
+// ============================================================
+function saveState() {
+  const state = {
+    activeQuestionIds: activeQuestions.map(q => q.id),
+    currentIdx,
+    phase,
+    results,
+    sessionStartTime
+  };
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+  updateBottomBar();
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch(e) { return null; }
+}
+
+function clearState() {
+  try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+}
+
+function updateBottomBar() {
+  const answered = results.filter(r => r);
+  if (answered.length === 0) {
+    bottomBar.classList.add("hidden");
+    return;
+  }
+  bottomBar.classList.remove("hidden");
+  const correct = answered.filter(r => r.correct).length;
+  const rated = answered.filter(r => r.rating > 0).length;
+  barStatus.innerHTML = `<strong>${answered.length}</strong> repondue${answered.length>1?"s":""} | <strong>${correct}</strong> bonne${correct>1?"s":""} | <strong>${rated}</strong> notee${rated>1?"s":""}`;
+}
+
+// ============================================================
+// START SCREEN
+// ============================================================
+function renderStart() {
+  const saved = loadState();
+  const themeCounts = {};
+  questions.forEach(q => { themeCounts[q.theme] = (themeCounts[q.theme]||0) + 1; });
+
+  let themeChips = themes.map((t,i) => {
+    const n = themeCounts[i]||0;
+    return `<span class="theme-chip active" data-theme="${i}">${t} <span class="chip-count">(${n})</span></span>`;
+  }).join("");
+
+  const resumeHtml = saved ? `
+    <div class="card" style="border-color:var(--accent);margin-bottom:20px;text-align:center">
+      <p style="margin-bottom:12px"><strong>Session en cours</strong> — ${saved.results.filter(r=>r).length} / ${saved.activeQuestionIds.length} questions repondues</p>
+      <div style="display:flex;gap:12px;justify-content:center">
+        <button class="btn btn-primary" id="btn-resume">Reprendre</button>
+        <button class="btn btn-secondary" id="btn-discard">Nouvelle session</button>
+      </div>
+    </div>
+  ` : "";
+
+  app.innerHTML = `
+    <div class="start-screen">
+      <h1>Quiz Shower de Bebe — Testeur</h1>
+      <p>Parcours les questions une par une, reponds, note la qualite de chaque question de 1 a 5. Le rapport .md se met a jour automatiquement apres chaque question.</p>
+      <div class="stat-row">
+        <div class="stat"><span class="stat-num">${questions.length}</span><span class="stat-label">questions</span></div>
+        <div class="stat"><span class="stat-num">${themes.length}</span><span class="stat-label">themes</span></div>
+      </div>
+      ${resumeHtml}
+      <div class="card filter-section">
+        <h3>Themes a inclure (cliquer pour activer/desactiver) :</h3>
+        <div class="theme-filters">${themeChips}</div>
+        <div style="text-align:center;margin-top:8px;">
+          <button class="btn btn-secondary" id="btn-all">Tout</button>
+          <button class="btn btn-secondary" id="btn-none">Aucun</button>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="btn-start" style="font-size:1.1rem;padding:14px 40px;">Commencer le quiz</button>
+      <p id="q-count-label" style="margin-top:12px;color:var(--muted);font-size:0.85rem;">${questions.length} questions selectionnees</p>
+    </div>
+  `;
+
+  document.querySelectorAll(".theme-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      chip.classList.toggle("active");
+      updateCount();
+    });
+  });
+  document.getElementById("btn-all").addEventListener("click", () => {
+    document.querySelectorAll(".theme-chip").forEach(c => c.classList.add("active"));
+    updateCount();
+  });
+  document.getElementById("btn-none").addEventListener("click", () => {
+    document.querySelectorAll(".theme-chip").forEach(c => c.classList.remove("active"));
+    updateCount();
+  });
+  document.getElementById("btn-start").addEventListener("click", startQuiz);
+
+  if (document.getElementById("btn-resume")) {
+    document.getElementById("btn-resume").addEventListener("click", resumeQuiz);
+    document.getElementById("btn-discard").addEventListener("click", () => {
+      clearState();
+      bottomBar.classList.add("hidden");
+      renderStart();
+    });
+  }
+
+  function updateCount() {
+    const sel = getSelectedThemes();
+    const n = questions.filter(q => sel.has(q.theme)).length;
+    document.getElementById("q-count-label").textContent = `${n} questions selectionnees`;
+  }
+}
+
+function getSelectedThemes() {
+  const s = new Set();
+  document.querySelectorAll(".theme-chip.active").forEach(c => s.add(parseInt(c.dataset.theme)));
+  return s;
+}
+
+function startQuiz() {
+  const sel = getSelectedThemes();
+  activeQuestions = questions.filter(q => sel.has(q.theme));
+  if (activeQuestions.length === 0) return;
+  currentIdx = 0;
+  results = new Array(activeQuestions.length).fill(null);
+  phase = "question";
+  selectedAnswer = null;
+  sessionStartTime = new Date().toISOString();
+  clearState();
+  saveState();
+  renderQuestion();
+}
+
+function resumeQuiz() {
+  const saved = loadState();
+  if (!saved) return;
+  const qMap = new Map(questions.map(q => [q.id, q]));
+  activeQuestions = saved.activeQuestionIds.map(id => qMap.get(id)).filter(Boolean);
+  results = saved.results;
+  sessionStartTime = saved.sessionStartTime;
+  // Find first unanswered question
+  currentIdx = results.findIndex(r => r === null);
+  if (currentIdx === -1) currentIdx = results.length - 1;
+  phase = "question";
+  selectedAnswer = null;
+  updateBottomBar();
+  renderQuestion();
+}
+
+// ============================================================
+// QUESTION PHASE
+// ============================================================
+function renderQuestion() {
+  const q = activeQuestions[currentIdx];
+  const pct = ((currentIdx) / activeQuestions.length * 100).toFixed(1);
+
+  let choicesHtml = q.choices.map((c,i) => {
+    return `<li data-idx="${i}">${letters[i]}) ${c}</li>`;
+  }).join("");
+
+  app.innerHTML = `
+    <div class="counter">Question ${currentIdx+1} / ${activeQuestions.length}</div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <div class="card">
+      <span class="theme-tag">${themes[q.theme]}</span>
+      <div class="q-text"><span class="q-number">Q${q.id}.</span> ${q.text}</div>
+      <ul class="choices">${choicesHtml}</ul>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-skip" id="btn-skip">Passer (sans repondre)</button>
+      <button class="btn btn-primary" id="btn-confirm" disabled>Confirmer</button>
+    </div>
+  `;
+
+  selectedAnswer = null;
+  document.querySelectorAll(".choices li").forEach(li => {
+    li.addEventListener("click", () => {
+      document.querySelectorAll(".choices li").forEach(l => l.classList.remove("selected"));
+      li.classList.add("selected");
+      selectedAnswer = letters[parseInt(li.dataset.idx)];
+      document.getElementById("btn-confirm").disabled = false;
+    });
+  });
+  document.getElementById("btn-confirm").addEventListener("click", () => showAnswer(selectedAnswer));
+  document.getElementById("btn-skip").addEventListener("click", () => showAnswer(null));
+}
+
+// ============================================================
+// ANSWER PHASE
+// ============================================================
+function showAnswer(userAnswer) {
+  phase = "answer";
+  const q = activeQuestions[currentIdx];
+  const isCorrect = userAnswer === q.answer;
+  const answerIdx = letters.indexOf(q.answer);
+
+  let badge;
+  if (userAnswer === null) badge = `<span class="result-badge skipped">Passee</span>`;
+  else if (isCorrect) badge = `<span class="result-badge correct">Bonne reponse!</span>`;
+  else badge = `<span class="result-badge wrong">Mauvaise reponse (tu as choisi ${userAnswer})</span>`;
+
+  let choicesHtml = q.choices.map((c,i) => {
+    let cls = "disabled";
+    if (i === answerIdx) cls += " correct-reveal";
+    else if (userAnswer && letters[i] === userAnswer) cls += " wrong-reveal";
+    return `<li class="${cls}">${letters[i]}) ${c}</li>`;
+  }).join("");
+
+  const ratingLabels = ["","Mauvaise","Bof","Correcte","Bonne","Excellente"];
+
+  app.innerHTML = `
+    <div class="counter">Question ${currentIdx+1} / ${activeQuestions.length}</div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${((currentIdx+1)/activeQuestions.length*100).toFixed(1)}%"></div></div>
+    <div class="card">
+      <span class="theme-tag">${themes[q.theme]}</span>
+      <div class="q-text"><span class="q-number">Q${q.id}.</span> ${q.text}</div>
+      ${badge}
+      <ul class="choices">${choicesHtml}</ul>
+      <div class="explanation"><strong>Reponse : ${q.answer})</strong> ${q.explanation}</div>
+      <div class="rating-section">
+        <div class="rating-label">Qualite de cette question :</div>
+        <div class="rating-desc">1 = mauvaise question, 5 = excellente question a garder</div>
+        <div class="stars">
+          ${[1,2,3,4,5].map(n => `<span class="star" data-val="${n}">&#9733;</span>`).join("")}
+        </div>
+        <div class="rating-text" id="rating-text"></div>
+      </div>
+    </div>
+    <div class="btn-row">
+      ${currentIdx > 0 ? `<button class="btn btn-secondary" id="btn-prev">Precedente</button>` : `<span></span>`}
+      <button class="btn btn-primary" id="btn-next">${currentIdx < activeQuestions.length - 1 ? "Suivante" : "Voir les resultats"}</button>
+    </div>
+  `;
+
+  let currentRating = 0;
+  const ratingText = document.getElementById("rating-text");
+
+  document.querySelectorAll(".star").forEach(star => {
+    star.addEventListener("click", () => {
+      currentRating = parseInt(star.dataset.val);
+      document.querySelectorAll(".star").forEach(s => {
+        s.classList.toggle("active", parseInt(s.dataset.val) <= currentRating);
+      });
+      ratingText.textContent = ratingLabels[currentRating];
+      // Auto-save on every rating click
+      saveCurrentResult();
+    });
+    star.addEventListener("mouseenter", () => {
+      document.querySelectorAll(".star").forEach(s => {
+        s.classList.toggle("active", parseInt(s.dataset.val) <= parseInt(star.dataset.val));
+      });
+      ratingText.textContent = ratingLabels[parseInt(star.dataset.val)];
+    });
+    star.addEventListener("mouseleave", () => {
+      document.querySelectorAll(".star").forEach(s => {
+        s.classList.toggle("active", parseInt(s.dataset.val) <= currentRating);
+      });
+      ratingText.textContent = currentRating ? ratingLabels[currentRating] : "";
+    });
+  });
+
+  function saveCurrentResult() {
+    results[currentIdx] = {
+      qId: q.id,
+      theme: q.theme,
+      userAnswer: userAnswer,
+      correct: isCorrect,
+      skipped: userAnswer === null,
+      rating: currentRating
+    };
+    saveState();
+  }
+
+  document.getElementById("btn-next").addEventListener("click", () => {
+    saveCurrentResult();
+    if (currentIdx < activeQuestions.length - 1) {
+      currentIdx++;
+      phase = "question";
+      selectedAnswer = null;
+      renderQuestion();
+    } else {
+      renderSummary();
+    }
+  });
+
+  if (document.getElementById("btn-prev")) {
+    document.getElementById("btn-prev").addEventListener("click", () => {
+      saveCurrentResult();
+      currentIdx--;
+      phase = "question";
+      selectedAnswer = null;
+      renderQuestion();
+    });
+  }
+}
+
+// ============================================================
+// SUMMARY SCREEN
+// ============================================================
+function renderSummary() {
+  const answered = results.filter(r => !r.skipped);
+  const correctCount = results.filter(r => r.correct).length;
+  const rated = results.filter(r => r.rating > 0);
+  const avgRating = rated.length ? (rated.reduce((s,r) => s+r.rating, 0) / rated.length).toFixed(1) : "—";
+
+  let rows = results.map((r,i) => {
+    const q = activeQuestions[i];
+    const statusDot = r.skipped ? '<span class="dot s"></span>Passee' :
+                      r.correct ? '<span class="dot c"></span>Bonne' :
+                      '<span class="dot w"></span>Mauvaise';
+    const stars = [1,2,3,4,5].map(n =>
+      `<span class="star-small${n <= r.rating ? "" : " off"}">&#9733;</span>`
+    ).join("");
+    return `<tr>
+      <td>Q${q.id}</td>
+      <td style="max-width:280px">${q.text.substring(0,60)}${q.text.length>60?"...":""}</td>
+      <td>${statusDot}</td>
+      <td>${stars}</td>
+    </tr>`;
+  }).join("");
+
+  // Group by rating for summary
+  const byRating = {5:[],4:[],3:[],2:[],1:[],0:[]};
+  results.forEach((r,i) => byRating[r.rating].push(activeQuestions[i].id));
+
+  app.innerHTML = `
+    <div class="summary-header">
+      <h1>Resultats</h1>
+      <div class="summary-score">${correctCount} / ${answered.length} bonnes reponses</div>
+      <p style="color:var(--muted)">Note moyenne de qualite : ${avgRating} / 5 (${rated.length} questions notees)</p>
+    </div>
+    <div class="card" style="overflow-x:auto">
+      <table class="summary-table">
+        <thead><tr><th>#</th><th>Question</th><th>Resultat</th><th>Qualite</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div style="text-align:center;margin:20px 0">
+      <p style="margin-bottom:4px;font-size:0.85rem;color:var(--muted)">Questions par note de qualite :</p>
+      ${[5,4,3,2,1].map(r => byRating[r].length ? `<p><strong>${r}/5</strong> : Q${byRating[r].join(", Q")}</p>` : "").join("")}
+      ${byRating[0].length ? `<p style="color:var(--muted)"><strong>Non notees</strong> : Q${byRating[0].join(", Q")}</p>` : ""}
+    </div>
+    <div class="btn-row" style="justify-content:center;gap:16px;flex-wrap:wrap">
+      <button class="btn btn-export" id="btn-export">Telecharger le rapport (.md)</button>
+      <button class="btn btn-secondary" id="btn-restart">Recommencer</button>
+    </div>
+  `;
+
+  document.getElementById("btn-export").addEventListener("click", exportMd);
+  document.getElementById("btn-restart").addEventListener("click", () => {
+    clearState();
+    bottomBar.classList.add("hidden");
+    renderStart();
+  });
+}
+
+// ============================================================
+// EXPORT TO .MD
+// ============================================================
+function generateMd() {
+  const now = new Date();
+  const dateStr = now.toISOString().slice(0,10);
+  const timeStr = now.toTimeString().slice(0,5);
+
+  // Filter out null entries (unanswered questions)
+  const answeredResults = [];
+  const answeredQuestions = [];
+  results.forEach((r,i) => {
+    if (r) { answeredResults.push(r); answeredQuestions.push(activeQuestions[i]); }
+  });
+
+  if (answeredResults.length === 0) return null;
+
+  const nonSkipped = answeredResults.filter(r => !r.skipped);
+  const correctCount = answeredResults.filter(r => r.correct).length;
+  const rated = answeredResults.filter(r => r.rating > 0);
+  const avgRating = rated.length ? (rated.reduce((s,r) => s+r.rating, 0) / rated.length).toFixed(1) : "N/A";
+
+  const ratingLabels = ["Non notee","Mauvaise","Bof","Correcte","Bonne","Excellente"];
+  const stars = n => n > 0 ? Array(n).fill("*").join("") + Array(5-n).fill(".").join("") : ".....";
+
+  let md = `# Resultats du test — Quiz Shower de Bebe\n\n`;
+  md += `- **Date** : ${dateStr} ${timeStr}\n`;
+  md += `- **Progression** : ${answeredResults.length} / ${activeQuestions.length} questions repondues\n`;
+  md += `- **Score** : ${correctCount} / ${nonSkipped.length} bonnes reponses`;
+  if (nonSkipped.length > 0) md += ` (${(correctCount/nonSkipped.length*100).toFixed(0)} %)`;
+  md += `\n`;
+  md += `- **Note moyenne de qualite** : ${avgRating} / 5\n\n`;
+
+  md += `---\n\n`;
+
+  // Questions by rating (best first)
+  md += `## Resume par note de qualite\n\n`;
+  const byRating = {5:[],4:[],3:[],2:[],1:[],0:[]};
+  answeredResults.forEach((r,i) => byRating[r.rating].push(answeredQuestions[i].id));
+
+  for (let r = 5; r >= 1; r--) {
+    if (byRating[r].length) {
+      md += `- **${r}/5 (${ratingLabels[r]})** : Q${byRating[r].join(", Q")}\n`;
+    }
+  }
+  if (byRating[0].length) {
+    md += `- **Non notees** : Q${byRating[0].join(", Q")}\n`;
+  }
+  md += `\n`;
+
+  // Recommended questions to keep (4-5 stars)
+  const keepers = [...byRating[5], ...byRating[4]];
+  if (keepers.length > 0) {
+    md += `### Questions recommandees a garder (4-5 etoiles)\n\n`;
+    md += `> Q${keepers.join(", Q")}\n`;
+    md += `> (${keepers.length} questions)\n\n`;
+  }
+
+  md += `---\n\n`;
+
+  // Detailed results
+  md += `## Detail par question\n\n`;
+
+  let lastTheme = -1;
+  answeredResults.forEach((r,i) => {
+    const q = answeredQuestions[i];
+    if (q.theme !== lastTheme) {
+      md += `### ${themes[q.theme]}\n\n`;
+      lastTheme = q.theme;
+    }
+    const status = r.skipped ? "PASSEE" : r.correct ? "BONNE" : "MAUVAISE";
+    md += `**Q${q.id}.** ${q.text}\n`;
+    md += `- Reponse : ${r.skipped ? "—" : r.userAnswer} | Correcte : ${q.answer} | ${status}\n`;
+    md += `- Qualite : ${stars(r.rating)} ${r.rating}/5 (${ratingLabels[r.rating]})\n\n`;
+  });
+
+  return { md, dateStr };
+}
+
+function exportMd() {
+  const out = generateMd();
+  if (!out) return;
+  const blob = new Blob([out.md], {type: "text/markdown;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `quiz_resultats_${out.dateStr}.md`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderStart();
+</script>
+</body>
+</html>

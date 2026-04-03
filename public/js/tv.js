@@ -1,13 +1,11 @@
-// tv.js — Logique de la vue TV (1080p Chromecast)
+// tv.js — Vue TV (écoute Firebase, affiche)
 
 import { PLAYERS, createToken, updateTokenMood, getPlayerById } from './players.js';
 import { QUESTIONS } from './questions.js';
-import { QuizEngine, getRanking } from './quiz-engine.js';
-import { initDB } from './db.js';
+import { getRanking } from './quiz-engine.js';
+import { initDB, dbListen } from './db.js';
 
-// --- Init ---
-
-const engine = new QuizEngine(QUESTIONS, PLAYERS);
+// --- Screens ---
 
 const screens = {
   lobby: document.getElementById('screen-lobby'),
@@ -17,47 +15,54 @@ const screens = {
 };
 
 function showScreen(phase) {
-  // reveal utilise le même écran que question
   const screenKey = phase === 'reveal' ? 'question' : phase;
   for (const [key, el] of Object.entries(screens)) {
     el.classList.toggle('active', key === screenKey);
   }
 }
 
+// --- State ---
+
+let currentState = null;
+let currentVotes = {};
+let revealResults = null;
+
 // --- Lobby ---
 
-function renderLobby() {
+function renderLobby(connectedPlayers) {
   const container = document.getElementById('lobby-players');
   container.innerHTML = '';
   for (const player of PLAYERS) {
+    const isConnected = connectedPlayers && connectedPlayers.includes(player.id);
     const token = createToken(player, 'neutral', { size: 'tv' });
     token.style.animationDelay = `${PLAYERS.indexOf(player) * 0.1}s`;
+    if (!isConnected) token.style.opacity = '0.35';
     container.appendChild(token);
   }
 }
 
 // --- Question ---
 
-const playersColumn = document.getElementById('players-column');
-let playerTokens = {}; // { playerId: HTMLElement }
+let playerTokens = {};
 
-function renderPlayersColumn() {
-  playersColumn.innerHTML = '';
+function renderPlayersColumn(connectedPlayers) {
+  const col = document.getElementById('players-column');
+  col.innerHTML = '';
   playerTokens = {};
   for (const player of PLAYERS) {
-    if (!engine.connectedPlayers.includes(player.id)) continue;
+    if (!connectedPlayers || !connectedPlayers.includes(player.id)) continue;
     const token = createToken(player, 'neutral', { size: 'tv' });
     playerTokens[player.id] = token;
-    playersColumn.appendChild(token);
+    col.appendChild(token);
   }
 }
 
-function renderQuestion() {
-  const q = engine.currentQuestion;
+function renderQuestion(questionIndex, totalQuestions) {
+  const q = QUESTIONS[questionIndex];
   if (!q) return;
 
   document.getElementById('q-number').textContent =
-    `Question ${engine.currentQuestionIndex + 1}/${engine.totalQuestions}`;
+    `Question ${questionIndex + 1}/${totalQuestions}`;
   document.getElementById('q-theme').textContent = q.theme;
   document.getElementById('q-text').textContent = q.text;
 
@@ -71,11 +76,10 @@ function renderQuestion() {
     choicesEl.appendChild(div);
   }
 
-  // Cacher l'explication
   document.getElementById('q-explanation').classList.remove('visible');
   document.getElementById('q-explanation').textContent = '';
 
-  // Reset les moods des jetons
+  // Reset token moods
   for (const [id, tokenEl] of Object.entries(playerTokens)) {
     const player = getPlayerById(id);
     if (player) updateTokenMood(tokenEl, player, 'neutral');
@@ -83,40 +87,52 @@ function renderQuestion() {
   }
 }
 
+function updateVoteIndicators(votes) {
+  if (!votes) return;
+  for (const [playerId, choice] of Object.entries(votes)) {
+    const tokenEl = playerTokens[playerId];
+    if (tokenEl && choice != null) {
+      tokenEl.dataset.voted = 'true';
+    }
+  }
+}
+
 // --- Reveal ---
 
-function renderReveal(questionIndex, correctAnswer, results) {
-  // Mettre en évidence la bonne réponse
+function renderReveal(questionIndex, results) {
+  const q = QUESTIONS[questionIndex];
+  if (!q) return;
+
+  // Highlight correct answer
   const choicesEl = document.getElementById('q-choices');
   for (const div of choicesEl.children) {
-    if (div.dataset.letter === correctAnswer) {
+    if (div.dataset.letter === q.answer) {
       div.classList.add('correct');
     }
   }
 
-  // Afficher l'explication
-  const q = engine.currentQuestion;
-  if (q && q.explanation) {
+  // Show explanation
+  if (q.explanation) {
     const explEl = document.getElementById('q-explanation');
     explEl.textContent = q.explanation;
     explEl.classList.add('visible');
   }
 
-  // Animer les jetons
-  for (const [playerId, { correct }] of Object.entries(results)) {
-    const tokenEl = playerTokens[playerId];
-    const player = getPlayerById(playerId);
-    if (!tokenEl || !player) continue;
-
-    const mood = correct ? 'happy' : 'sad';
-    updateTokenMood(tokenEl, player, mood);
+  // Animate tokens
+  if (results) {
+    for (const [playerId, result] of Object.entries(results)) {
+      const tokenEl = playerTokens[playerId];
+      const player = getPlayerById(playerId);
+      if (!tokenEl || !player) continue;
+      updateTokenMood(tokenEl, player, result.correct ? 'happy' : 'sad');
+    }
   }
 }
 
 // --- Scores ---
 
-function renderScores(targetEl) {
-  const ranking = getRanking(engine.scores);
+function renderScores(scores, targetEl) {
+  const ranking = getRanking(scores || {});
   const maxScore = Math.max(1, ...ranking.map(r => r.score));
 
   targetEl = targetEl || document.getElementById('scoreboard');
@@ -130,9 +146,7 @@ function renderScores(targetEl) {
     row.className = 'score-row';
     row.style.animationDelay = `${rank * 0.08}s`;
 
-    row.innerHTML = `
-      <span class="score-rank">${rank}.</span>
-    `;
+    row.innerHTML = `<span class="score-rank">${rank}.</span>`;
 
     const token = createToken(player, 'neutral', { size: 'admin' });
     row.appendChild(token);
@@ -151,20 +165,18 @@ function renderScores(targetEl) {
   }
 }
 
-// --- Final / Podium ---
+// --- Final ---
 
-function renderFinal() {
-  const ranking = getRanking(engine.scores);
+function renderFinal(scores) {
+  const ranking = getRanking(scores || {});
   const podium = document.getElementById('podium');
   podium.innerHTML = '';
 
-  // Podium : 2e, 1er, 3e (affichage classique)
-  const order = [1, 0, 2]; // indices dans ranking
+  const order = [1, 0, 2]; // 2nd, 1st, 3rd
   const placeClasses = ['podium-2nd', 'podium-1st', 'podium-3rd'];
 
   for (let i = 0; i < 3; i++) {
-    const idx = order[i];
-    const entry = ranking[idx];
+    const entry = ranking[order[i]];
     if (!entry) continue;
     const player = getPlayerById(entry.playerId);
     if (!player) continue;
@@ -183,54 +195,80 @@ function renderFinal() {
     podium.appendChild(place);
   }
 
-  renderScores(document.getElementById('final-scoreboard'));
+  renderScores(scores, document.getElementById('final-scoreboard'));
 }
 
-// --- Events ---
+// --- Main state listener ---
 
-engine.on('phase-change', (phase) => {
+let lastPhase = null;
+let lastQuestionIndex = null;
+
+function onStateChange(state) {
+  if (!state) return;
+  currentState = state;
+  const { phase, currentQuestion, scores, connectedPlayers, totalQuestions } = state;
+
   showScreen(phase);
+
   switch (phase) {
     case 'lobby':
-      renderLobby();
+      renderLobby(connectedPlayers);
       break;
+
     case 'question':
-      renderPlayersColumn();
-      renderQuestion();
+      if (lastPhase !== 'question' || lastQuestionIndex !== currentQuestion) {
+        renderPlayersColumn(connectedPlayers);
+        renderQuestion(currentQuestion, totalQuestions);
+      }
+      updateVoteIndicators(currentVotes);
+      revealResults = null;
       break;
+
+    case 'reveal':
+      if (lastPhase === 'question') {
+        // On vient de passer en reveal — l'animation sera déclenchée par revealResults
+      }
+      break;
+
     case 'scores':
-      renderScores();
+      renderScores(scores);
       break;
+
     case 'final':
-      renderFinal();
+      renderFinal(scores);
       break;
   }
-});
 
-engine.on('vote', (playerId) => {
-  const tokenEl = playerTokens[playerId];
-  if (tokenEl) tokenEl.dataset.voted = 'true';
-});
-
-engine.on('answer-revealed', renderReveal);
+  lastPhase = phase;
+  lastQuestionIndex = currentQuestion;
+}
 
 // --- Boot ---
 
 async function boot() {
   await initDB();
 
-  // En mode offline, connecter tous les joueurs automatiquement pour le preview
-  for (const p of PLAYERS) {
-    engine.connectPlayer(p.id);
-  }
+  // Écouter l'état du quiz
+  dbListen('state', onStateChange);
 
-  // Afficher le lobby
+  // Écouter les votes (pour les indicateurs visuels)
+  dbListen('votes', (votes) => {
+    currentVotes = votes || {};
+    if (currentState && currentState.phase === 'question') {
+      updateVoteIndicators(currentVotes);
+    }
+  });
+
+  // Écouter les résultats de révélation
+  dbListen('state/revealResults', (results) => {
+    if (results && currentState) {
+      renderReveal(currentState.currentQuestion, results);
+    }
+  });
+
+  // Afficher le lobby par défaut
   showScreen('lobby');
-  renderLobby();
+  renderLobby([]);
 }
 
 boot();
-
-// Exposer l'engine pour le debug et pour que l'admin puisse le contrôler
-// (en mode offline, les deux onglets partagent la même instance via BroadcastChannel)
-window.__quizEngine = engine;

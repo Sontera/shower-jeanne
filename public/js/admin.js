@@ -1,15 +1,16 @@
-// admin.js — Logique de la vue animateur
+// admin.js — Vue animateur (maître : écrit l'état dans Firebase)
 
 import { PLAYERS, createToken, getPlayerById } from './players.js';
 import { QUESTIONS } from './questions.js';
 import { QuizEngine, getRanking } from './quiz-engine.js';
-import { initDB } from './db.js';
+import { initDB, dbSet, dbListen } from './db.js';
 
-// --- Init ---
+// --- Engine (seul l'admin en possède un) ---
 
 const engine = new QuizEngine(QUESTIONS, PLAYERS);
 
-// DOM
+// --- DOM ---
+
 const phaseBadge = document.getElementById('phase-badge');
 const btnStart = document.getElementById('btn-start');
 const btnReveal = document.getElementById('btn-reveal');
@@ -17,7 +18,28 @@ const btnScores = document.getElementById('btn-scores');
 const btnNext = document.getElementById('btn-next');
 const btnBack = document.getElementById('btn-back');
 
-// --- Render functions ---
+// --- Sync engine → Firebase ---
+
+function syncState() {
+  const state = engine.getState();
+  dbSet('state', {
+    phase: state.phase,
+    currentQuestion: state.currentQuestion,
+    scores: state.scores,
+    connectedPlayers: state.connectedPlayers,
+    totalQuestions: engine.totalQuestions,
+  });
+}
+
+function syncRevealResults(results) {
+  dbSet('state/revealResults', results);
+}
+
+function clearVotes() {
+  dbSet('votes', null);
+}
+
+// --- Render ---
 
 function renderPlayerList() {
   const list = document.getElementById('admin-player-list');
@@ -37,7 +59,6 @@ function updateControls(phase) {
   btnNext.disabled = phase !== 'scores';
   btnBack.disabled = phase === 'lobby' || phase === 'final';
 
-  // Afficher/cacher les panneaux
   document.getElementById('panel-config').style.display =
     phase === 'lobby' ? 'block' : 'none';
   document.getElementById('question-info').style.display =
@@ -51,8 +72,9 @@ function renderQuestionInfo() {
   if (!q) return;
   document.getElementById('admin-q-text').textContent =
     `[${q.id}] ${q.text}`;
+  const correctChoice = q.choices.find(c => c.startsWith(q.answer + ')')) || q.answer;
   document.getElementById('admin-q-answer').textContent =
-    `Bonne réponse : ${q.answer}) — ${q.choices.find(c => c.startsWith(q.answer + ')')) || q.answer}`;
+    `Bonne réponse : ${correctChoice}`;
 }
 
 function renderVoteStatus() {
@@ -92,19 +114,59 @@ function renderVoteStatus() {
   document.getElementById('player-count').textContent = connected.length;
 }
 
-// --- Events ---
+// --- Engine events → sync + render ---
 
 engine.on('phase-change', (phase) => {
   updateControls(phase);
   if (phase === 'question') {
     renderQuestionInfo();
     renderVoteStatus();
+    clearVotes();
   }
+  syncState();
 });
 
 engine.on('vote', () => {
   renderVoteStatus();
+  syncState();
 });
+
+engine.on('answer-revealed', (_qi, _answer, results) => {
+  syncRevealResults(results);
+  syncState();
+});
+
+engine.on('scores-update', () => {
+  syncState();
+});
+
+// --- Listen for votes from players (Firebase → engine) ---
+
+function listenForVotes() {
+  dbListen('votes', (votes) => {
+    if (!votes || engine.phase !== 'question') return;
+    for (const [playerId, choice] of Object.entries(votes)) {
+      if (choice != null && engine.votes[playerId] == null) {
+        engine.castVote(playerId, choice);
+      }
+    }
+  });
+}
+
+// --- Listen for player connections ---
+
+function listenForPlayers() {
+  dbListen('players', (players) => {
+    if (!players) return;
+    for (const playerId of Object.keys(players)) {
+      if (!engine.connectedPlayers.includes(playerId)) {
+        engine.connectPlayer(playerId);
+        renderVoteStatus();
+        syncState();
+      }
+    }
+  });
+}
 
 // --- Button handlers ---
 
@@ -119,14 +181,22 @@ btnBack.addEventListener('click', () => engine.goBack());
 async function boot() {
   await initDB();
 
-  for (const p of PLAYERS) {
-    engine.connectPlayer(p.id);
-  }
+  // Reset Firebase state
+  await dbSet('state', {
+    phase: 'lobby',
+    currentQuestion: 0,
+    scores: {},
+    connectedPlayers: [],
+    totalQuestions: engine.totalQuestions,
+  });
+  await dbSet('votes', null);
+  await dbSet('players', null);
 
   renderPlayerList();
   updateControls('lobby');
+
+  listenForVotes();
+  listenForPlayers();
 }
 
 boot();
-
-window.__quizEngine = engine;
