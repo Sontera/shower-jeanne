@@ -77,7 +77,9 @@ function renderVoteScreen(questionIndex) {
     const letter = choice.charAt(0);
     btn.addEventListener('click', async () => {
       await dbSet(`votes/${myPlayerId}`, letter);
-      showPlayScreen('screen-voted');
+      // Highlight le choix sélectionné, permettre de changer
+      container.querySelectorAll('.vote-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
     });
     container.appendChild(btn);
   }

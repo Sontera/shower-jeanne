@@ -101,14 +101,14 @@ function updateControls(phase) {
     phase === 'lobby' ? 'block' : 'none';
 
   const showQuestion = phase === 'question' || phase === 'reveal';
+  document.getElementById('admin-q-position').style.display = showQuestion ? 'block' : 'none';
   document.getElementById('question-info').style.display = showQuestion ? 'block' : 'none';
   document.getElementById('vote-status').style.display = showQuestion ? 'block' : 'none';
 
-  // Masquer la réponse pendant la phase question, montrer seulement en reveal
-  const answerEl = document.getElementById('admin-q-answer');
-  if (answerEl) {
-    answerEl.style.display = phase === 'reveal' ? 'block' : 'none';
-  }
+  // Masquer la réponse et l'explication pendant la phase question, montrer en reveal
+  const isReveal = phase === 'reveal';
+  document.getElementById('admin-q-answer').style.display = isReveal ? 'block' : 'none';
+  document.getElementById('admin-q-explanation').style.display = isReveal ? 'block' : 'none';
 }
 
 function renderQuestionInfo() {
@@ -119,12 +119,14 @@ function renderQuestionInfo() {
   let qInRound = engine.questionInRound;
   let roundTotal = engine.questionsInCurrentRound;
 
-  document.getElementById('admin-q-text').textContent =
-    `[R${q.round || '?'} Q${qInRound}/${roundTotal}] ${q.text}`;
+  document.getElementById('admin-q-position').textContent =
+    `Round ${q.round || '?'} — Question ${qInRound}/${roundTotal}`;
+  document.getElementById('admin-q-text').textContent = q.text;
 
   const correctChoice = q.choices.find(c => c.startsWith(q.answer + ')')) || q.answer;
   document.getElementById('admin-q-answer').textContent =
     `Bonne réponse : ${correctChoice}`;
+  document.getElementById('admin-q-explanation').textContent = q.explanation || '';
 }
 
 function renderVoteStatus() {
@@ -209,7 +211,7 @@ function listenForVotes() {
   dbListen('votes', (votes) => {
     if (!votes || engine.phase !== 'question') return;
     for (const [playerId, choice] of Object.entries(votes)) {
-      if (choice != null && engine.votes[playerId] == null) {
+      if (choice != null && engine.votes[playerId] !== choice) {
         engine.castVote(playerId, choice);
       }
     }

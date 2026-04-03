@@ -115,7 +115,6 @@ export class QuizEngine {
   castVote(playerId, choice) {
     if (this._phase !== 'question') return;
     if (!this._connectedPlayers.has(playerId)) return;
-    if (this._votes[playerId] != null) return;
 
     this._votes[playerId] = choice;
     this._emit('vote', playerId, choice);

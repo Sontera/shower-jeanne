@@ -113,6 +113,15 @@ h1 {
   background: #4a4a4a;
 }
 
+.q-position {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
 /* Info question en cours */
 .current-question-info {
   background: var(--surface);
@@ -146,6 +155,17 @@ h1 {
   padding: 10px 14px;
   border-radius: 8px;
   border-left: 4px solid var(--correct);
+  margin-bottom: 10px;
+}
+
+.current-question-info .q-explanation {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--accent-light);
+  padding: 12px 14px;
+  border-radius: 8px;
+  border-left: 4px solid var(--accent);
 }
 
 /* Statut des votes */

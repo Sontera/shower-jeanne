@@ -36,7 +36,12 @@ function renderLobby(connectedPlayers) {
     const isConnected = connectedPlayers && connectedPlayers.includes(player.id);
     const token = createToken(player, 'neutral', { size: 'tv' });
     token.style.animationDelay = `${PLAYERS.indexOf(player) * 0.1}s`;
-    if (!isConnected) token.style.opacity = '0.3';
+    if (isConnected) {
+      token.style.background = 'var(--correct-light)';
+      token.style.borderColor = 'var(--correct)';
+    } else {
+      token.style.opacity = '0.3';
+    }
     container.appendChild(token);
   }
 }
