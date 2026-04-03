@@ -138,7 +138,10 @@ body {
 
 .players-column .player-token {
   width: 100%;
-  justify-content: space-between;
+}
+
+.players-column .token-name {
+  flex: 1;
 }
 
 /* Colonne droite : question */
@@ -307,17 +310,18 @@ body {
   display: none;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   height: 100vh;
-  gap: 40px;
-  padding: 48px;
+  gap: 30px;
+  padding: 32px 48px;
+  overflow-y: auto;
 }
 .final-screen.active { display: flex; }
 
 .final-screen h2 {
-  font-size: 4rem;
+  font-size: 3.5rem;
   font-weight: 800;
   color: var(--accent-dark);
+  flex-shrink: 0;
 }
 
 .podium {

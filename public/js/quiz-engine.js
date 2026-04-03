@@ -151,25 +151,32 @@ export class QuizEngine {
     this._setPhase('scores');
   }
 
-  /** Reveal → question suivante (mid-round) */
+  /** Reveal → question suivante (mid-round) ou final (dernière question) */
   nextQuestion() {
+    // Dernière question : reveal → final directement
+    if (this._phase === 'reveal' && this.isLastQuestion) {
+      this._setPhase('final');
+      return;
+    }
+    // Mid-round : reveal → question suivante
     if (this._phase === 'reveal' && !this.isEndOfRound) {
       this._currentQuestion++;
       this._clearVotes();
       this._setPhase('question');
       return;
     }
-    // Après scores: round suivant ou final
+    // Après scores: round suivant
     if (this._phase === 'scores') {
-      if (this.isLastQuestion) {
-        this._setPhase('final');
-      } else {
-        this._currentQuestion++;
-        this._clearVotes();
-        this._setPhase('round-intro');
-      }
+      this._currentQuestion++;
+      this._clearVotes();
+      this._setPhase('round-intro');
       return;
     }
+  }
+
+  /** Aller directement au podium final depuis n'importe quelle phase */
+  goToFinal() {
+    this._setPhase('final');
   }
 
   goBack() {

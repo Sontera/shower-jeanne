@@ -19,6 +19,7 @@ const btnBack = document.getElementById('btn-back');
 const btnConnectAll = document.getElementById('btn-connect-all');
 const btnRandomVotes = document.getElementById('btn-random-votes');
 const btnReset = document.getElementById('btn-reset');
+const btnPodium = document.getElementById('btn-podium');
 const btnJeopardy = document.getElementById('btn-jeopardy');
 const btnMute = document.getElementById('btn-mute');
 const volumeSlider = document.getElementById('volume-slider');
@@ -70,11 +71,16 @@ function updateControls(phase) {
   btnReveal.disabled = phase !== 'question';
   btnRandomVotes.disabled = phase !== 'question';
 
-  // After reveal: "Classement" only at end of round, "Question suivante" mid-round
+  // After reveal: "Classement" at end of round (sauf dernière question), "Question suivante" mid-round
   if (phase === 'reveal') {
-    if (engine.isEndOfRound) {
+    if (engine.isLastQuestion) {
+      // Dernière question : aller direct au podium
+      btnScores.disabled = true;
+      btnNext.disabled = false;
+      btnNext.textContent = 'Podium final';
+    } else if (engine.isEndOfRound) {
       btnScores.disabled = false;
-      btnScores.textContent = engine.isLastQuestion ? 'Classement final' : 'Classement';
+      btnScores.textContent = 'Classement';
       btnNext.disabled = true;
     } else {
       btnScores.disabled = true;
@@ -84,7 +90,7 @@ function updateControls(phase) {
   } else if (phase === 'scores') {
     btnScores.disabled = true;
     btnNext.disabled = false;
-    btnNext.textContent = engine.isLastQuestion ? 'Podium final' : 'Round suivant';
+    btnNext.textContent = 'Round suivant';
   } else if (phase === 'round-intro') {
     btnScores.disabled = true;
     btnNext.disabled = false;
@@ -96,6 +102,9 @@ function updateControls(phase) {
   }
 
   btnBack.disabled = phase === 'lobby' || phase === 'final';
+
+  // Bouton podium : activé dès que le quiz a commencé
+  btnPodium.disabled = phase === 'lobby';
 
   document.getElementById('panel-config').style.display =
     phase === 'lobby' ? 'block' : 'none';
@@ -365,6 +374,10 @@ btnNext.addEventListener('click', () => {
   }
 });
 btnBack.addEventListener('click', () => engine.goBack());
+btnPodium.addEventListener('click', () => {
+  if (!confirm('Aller directement au podium final?')) return;
+  engine.goToFinal();
+});
 btnConnectAll.addEventListener('click', connectAllPlayers);
 btnRandomVotes.addEventListener('click', simulateRandomVotes);
 btnReset.addEventListener('click', resetQuiz);
