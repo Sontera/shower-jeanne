@@ -22,12 +22,18 @@ const btnBack = document.getElementById('btn-back');
 
 function syncState() {
   const state = engine.getState();
-  dbSet('state', {
+  const payload = {
     phase: state.phase,
     currentQuestion: state.currentQuestion,
     scores: state.scores,
     connectedPlayers: state.connectedPlayers,
     totalQuestions: engine.totalQuestions,
+  };
+  console.log('[admin] syncState:', JSON.stringify(payload));
+  dbSet('state', payload).then(() => {
+    console.log('[admin] Firebase write OK');
+  }).catch(err => {
+    console.error('[admin] Firebase write FAILED:', err);
   });
 }
 
