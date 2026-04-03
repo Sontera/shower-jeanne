@@ -101,7 +101,7 @@ body {
 
 .lobby-players .player-token {
   animation: fade-in 0.5s ease both;
-  width: 300px;
+  width: 340px;
 }
 
 .lobby-players .token-name {

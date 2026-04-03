@@ -77,14 +77,14 @@ body {
 }
 
 .token-avatar {
-  width: calc(var(--token-avatar-size) + 14px);
-  height: calc(var(--token-avatar-size) + 14px);
+  width: calc(var(--token-avatar-size) + 12px);
+  height: calc(var(--token-avatar-size) + 12px);
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
   border: 3px solid var(--player-color, var(--border));
   background: var(--player-color, var(--bg-warm));
-  margin: -7px -7px -7px 0;
+  margin: -6px -6px -6px 0;
   transition: border-color 0.35s, box-shadow 0.4s;
 }
 
