@@ -1,0 +1,244 @@
+/* common.css — Thème baby shower + composants partagés */
+
+:root {
+  /* Palette baby shower — pastel adulte */
+  --bg: #faf7f2;
+  --bg-warm: #f5f0e8;
+  --surface: #ffffff;
+  --text: #2d2a26;
+  --text-muted: #7a756d;
+  --border: #e8e3db;
+
+  --accent: #c4917b;
+  --accent-light: #f0ddd5;
+  --accent-dark: #a06b55;
+
+  --correct: #6aab7b;
+  --correct-light: #d8f0dd;
+  --correct-glow: rgba(106, 171, 123, 0.5);
+
+  --wrong: #c47070;
+  --wrong-light: #f0d8d8;
+  --wrong-glow: rgba(196, 112, 112, 0.5);
+
+  /* Typographie */
+  --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-round: 'Nunito', var(--font);
+
+  /* Tokens */
+  --token-avatar-size: 56px;
+  --token-height: 56px;
+  --token-radius: 30px;
+  --token-font-size: 1.1rem;
+}
+
+/* Reset */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================
+   JETONS JOUEURS
+   Structure: .player-token > .token-name + .token-avatar > img
+   Le nom est à gauche, l'icone circulaire est à droite.
+   ============================================================ */
+
+.player-token {
+  display: inline-flex;
+  align-items: center;
+  height: var(--token-height);
+  background: var(--surface);
+  border: 2px solid var(--player-color, var(--border));
+  border-radius: var(--token-radius);
+  padding-left: 16px;
+  padding-right: 3px; /* petit espace avant l'avatar */
+  gap: 10px;
+  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+  cursor: default;
+  user-select: none;
+}
+
+.token-name {
+  font-weight: 600;
+  font-size: var(--token-font-size);
+  color: var(--text);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.token-avatar {
+  width: var(--token-avatar-size);
+  height: var(--token-avatar-size);
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 3px solid var(--player-color, var(--border));
+  background: var(--player-color, var(--bg-warm));
+  transition: border-color 0.3s, box-shadow 0.4s;
+}
+
+.token-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* --- Taille TV (visible de loin) --- */
+.player-token--tv {
+  --token-avatar-size: 64px;
+  --token-height: 64px;
+  --token-radius: 34px;
+  --token-font-size: 1.25rem;
+  padding-left: 20px;
+  gap: 12px;
+}
+
+/* --- Taille admin --- */
+.player-token--admin {
+  --token-avatar-size: 44px;
+  --token-height: 44px;
+  --token-radius: 24px;
+  --token-font-size: 0.95rem;
+  padding-left: 12px;
+  gap: 8px;
+}
+
+/* --- Taille mobile --- */
+.player-token--mobile {
+  --token-avatar-size: 40px;
+  --token-height: 40px;
+  --token-radius: 22px;
+  --token-font-size: 0.9rem;
+  padding-left: 12px;
+  gap: 8px;
+}
+
+/* ============================================================
+   ÉTATS DES JETONS (mood)
+   ============================================================ */
+
+/* Neutre — état par défaut */
+.player-token[data-mood="neutral"] {
+  border-color: var(--player-color, var(--border));
+}
+
+/* Heureux — bonne réponse */
+.player-token[data-mood="happy"] {
+  border-color: var(--correct);
+  box-shadow: 0 0 16px var(--correct-glow);
+  animation: token-bounce 0.5s ease;
+}
+
+.player-token[data-mood="happy"] .token-avatar {
+  border-color: var(--correct);
+  box-shadow: 0 0 12px var(--correct-glow);
+}
+
+/* Triste — mauvaise réponse */
+.player-token[data-mood="sad"] {
+  border-color: var(--wrong);
+  box-shadow: 0 0 16px var(--wrong-glow);
+  animation: token-shake 0.5s ease;
+}
+
+.player-token[data-mood="sad"] .token-avatar {
+  border-color: var(--wrong);
+  box-shadow: 0 0 12px var(--wrong-glow);
+}
+
+/* A voté (en attente de révélation) */
+.player-token[data-voted="true"]::after {
+  content: '';
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-right: 6px;
+  flex-shrink: 0;
+  animation: pulse-dot 1.5s ease infinite;
+}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+
+@keyframes token-bounce {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.12); }
+  50%  { transform: scale(0.95); }
+  70%  { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes token-shake {
+  0%, 100% { transform: translateX(0); }
+  15%      { transform: translateX(-6px); }
+  30%      { transform: translateX(6px); }
+  45%      { transform: translateX(-5px); }
+  60%      { transform: translateX(5px); }
+  75%      { transform: translateX(-3px); }
+  90%      { transform: translateX(3px); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.5; transform: scale(0.8); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ============================================================
+   UTILITAIRES
+   ============================================================ */
+
+.fade-in {
+  animation: fade-in 0.4s ease both;
+}
+
+.slide-in-left {
+  animation: slide-in-left 0.4s ease both;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+/* Badge de score à côté du jeton */
+.token-score {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  border-radius: 14px;
+  background: var(--accent-light);
+  color: var(--accent-dark);
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 0 8px;
+  margin-left: 8px;
+}

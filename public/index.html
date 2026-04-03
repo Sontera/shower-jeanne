@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Shower de Bébé</title>
+  <script>
+    // Router : redirige vers la bonne vue selon le chemin
+    const path = location.pathname;
+    if (path === '/tv' || path === '/tv.html') {
+      // déjà sur la bonne page si rewrite actif
+    } else if (path === '/admin' || path === '/admin.html') {
+      // idem
+    } else {
+      // Par défaut, rediriger vers la vue joueur
+      location.replace('/play');
+    }
+  </script>
+</head>
+<body>
+  <p style="text-align:center; padding:40px; font-family:system-ui;">
+    Redirection en cours...
+  </p>
+</body>
+</html>

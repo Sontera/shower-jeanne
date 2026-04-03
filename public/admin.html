@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Shower de Bébé — Admin</title>
+  <link rel="stylesheet" href="css/common.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+  <div class="admin-container">
+    <h1>Panneau Animateur</h1>
+    <p class="admin-subtitle">Contrôle du quiz — Charles</p>
+    <div class="phase-badge" id="phase-badge">lobby</div>
+
+    <!-- Config (lobby) -->
+    <div id="panel-config" class="config-panel">
+      <h2>Joueurs</h2>
+      <div class="player-list-admin" id="admin-player-list"></div>
+    </div>
+
+    <!-- Contrôles en jeu -->
+    <div class="controls" id="controls">
+      <button class="btn btn-primary" id="btn-start">Lancer le quiz</button>
+      <button class="btn btn-primary" id="btn-reveal" disabled>Révéler la réponse</button>
+      <button class="btn btn-primary" id="btn-scores" disabled>Classement</button>
+      <button class="btn btn-primary" id="btn-next" disabled>Question suivante</button>
+      <button class="btn btn-secondary" id="btn-back" disabled>Retour</button>
+    </div>
+
+    <!-- Question en cours -->
+    <div class="current-question-info" id="question-info" style="display:none;">
+      <h3>Question actuelle</h3>
+      <p class="q-text" id="admin-q-text"></p>
+      <p class="q-answer" id="admin-q-answer"></p>
+    </div>
+
+    <!-- Statut des votes -->
+    <div class="vote-status" id="vote-status" style="display:none;">
+      <h3>Votes (<span id="vote-count">0</span>/<span id="player-count">0</span>)</h3>
+      <div id="vote-list"></div>
+    </div>
+  </div>
+
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>

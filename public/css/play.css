@@ -1,0 +1,245 @@
+/* play.css — Vue joueur (mobile-first) */
+
+body {
+  background: var(--bg);
+}
+
+.play-container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 20px 16px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Écran de connexion */
+.join-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 24px;
+  text-align: center;
+}
+
+.join-screen h1 {
+  font-size: 1.6rem;
+  color: var(--accent-dark);
+}
+
+.player-select {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.player-select-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  text-align: left;
+}
+
+.player-select-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.player-select-btn .color-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Écran d'attente */
+.waiting-screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 16px;
+  text-align: center;
+}
+
+.waiting-screen.active {
+  display: flex;
+}
+
+.waiting-screen p {
+  font-size: 1.2rem;
+  color: var(--text-muted);
+}
+
+.waiting-dots::after {
+  content: '';
+  animation: dots 1.5s steps(4) infinite;
+}
+
+@keyframes dots {
+  0%  { content: ''; }
+  25% { content: '.'; }
+  50% { content: '..'; }
+  75% { content: '...'; }
+}
+
+/* Écran de vote */
+.vote-screen {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  gap: 16px;
+}
+
+.vote-screen.active {
+  display: flex;
+}
+
+.vote-question {
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  padding: 16px 0;
+}
+
+.vote-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.vote-btn {
+  flex: 1;
+  min-height: 70px;
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  font-size: 1.15rem;
+  line-height: 1.4;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.vote-btn:active {
+  transform: scale(0.97);
+}
+
+.vote-btn:hover {
+  border-color: var(--accent);
+}
+
+.vote-btn.selected {
+  border-color: var(--accent);
+  background: var(--accent-light);
+  font-weight: 600;
+}
+
+/* Écran "vote envoyé" */
+.voted-screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 16px;
+  text-align: center;
+}
+
+.voted-screen.active {
+  display: flex;
+}
+
+.voted-check {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--correct-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+}
+
+/* Écran résultat */
+.result-screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 20px;
+  text-align: center;
+}
+
+.result-screen.active {
+  display: flex;
+}
+
+.result-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+}
+
+.result-icon.correct {
+  background: var(--correct-light);
+}
+
+.result-icon.wrong {
+  background: var(--wrong-light);
+}
+
+.result-answer {
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+
+.result-score {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.result-rank {
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+
+/* Score header (toujours visible en jeu) */
+.play-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+
+.play-header .player-name {
+  font-weight: 600;
+}
+
+.play-header .player-score {
+  font-weight: 700;
+  color: var(--accent-dark);
+}

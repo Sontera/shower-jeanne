@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Quiz Shower de Bébé</title>
+  <link rel="stylesheet" href="css/common.css">
+  <link rel="stylesheet" href="css/play.css">
+</head>
+<body>
+  <div class="play-container">
+
+    <!-- Header (visible quand connecté) -->
+    <div class="play-header" id="play-header" style="display:none;">
+      <span class="player-name" id="my-name"></span>
+      <span class="player-score" id="my-score">0 pts</span>
+    </div>
+
+    <!-- Écran de connexion -->
+    <div id="screen-join" class="join-screen">
+      <h1>Quiz Shower de Bébé</h1>
+      <p>Choisis ton nom :</p>
+      <div class="player-select" id="player-select"></div>
+    </div>
+
+    <!-- Écran d'attente -->
+    <div id="screen-waiting" class="waiting-screen">
+      <p>La prochaine question s'en vient<span class="waiting-dots"></span></p>
+    </div>
+
+    <!-- Écran de vote -->
+    <div id="screen-vote" class="vote-screen">
+      <p class="vote-question" id="vote-question"></p>
+      <div class="vote-buttons" id="vote-buttons"></div>
+    </div>
+
+    <!-- Vote envoyé -->
+    <div id="screen-voted" class="voted-screen">
+      <div class="voted-check">&#10003;</div>
+      <p>Réponse envoyée!</p>
+    </div>
+
+    <!-- Résultat -->
+    <div id="screen-result" class="result-screen">
+      <div class="result-icon" id="result-icon"></div>
+      <p class="result-answer" id="result-answer"></p>
+      <p class="result-score" id="result-score"></p>
+      <p class="result-rank" id="result-rank"></p>
+    </div>
+
+  </div>
+
+  <script type="module" src="js/play.js"></script>
+</body>
+</html>

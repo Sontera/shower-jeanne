@@ -1,0 +1,18 @@
+{
+  "hosting": {
+    "public": "public",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      { "source": "/tv", "destination": "/tv.html" },
+      { "source": "/admin", "destination": "/admin.html" },
+      { "source": "/play", "destination": "/play.html" },
+      { "source": "**", "destination": "/index.html" }
+    ],
+    "headers": [
+      {
+        "source": "**/*.js",
+        "headers": [{ "key": "Content-Type", "value": "application/javascript" }]
+      }
+    ]
+  }
+}
