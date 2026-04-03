@@ -179,9 +179,15 @@ function renderScores(scores, targetEl, roundLabel) {
     document.getElementById('scores-title').textContent = roundLabel;
   }
 
+  const total = ranking.length;
   for (const { playerId, score, rank } of ranking) {
     const player = getPlayerById(playerId);
     if (!player) continue;
+
+    // Mood selon le rang : top 3 = happy, bottom 3 = sad, milieu = neutral
+    let mood = 'neutral';
+    if (rank <= 3) mood = 'happy';
+    else if (rank > total - 3) mood = 'sad';
 
     const row = document.createElement('div');
     row.className = 'score-row';
@@ -189,7 +195,7 @@ function renderScores(scores, targetEl, roundLabel) {
 
     row.innerHTML = `<span class="score-rank">${rank}.</span>`;
 
-    const token = createToken(player, 'neutral', { size: 'admin' });
+    const token = createToken(player, mood, { size: 'admin' });
     row.appendChild(token);
 
     const bar = document.createElement('div');

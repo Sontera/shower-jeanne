@@ -8,7 +8,7 @@ export const QUESTIONS = [
   // ===== ROUND 1 : Traditions et rituels du monde =====
 
   {
-    id: 'Q11',
+    id: 'Q1',
     text: 'En Bulgarie, quand quelqu\'un voit un beau bébé, quelle est la tradition?',
     choices: ['A) On lui donne une pièce de monnaie', 'B) On fait semblant que le bébé est laid', 'C) On lui chante une berceuse', 'D) On touche ses pieds trois fois'],
     answer: 'B',
@@ -17,7 +17,7 @@ export const QUESTIONS = [
     round: 1,
   },
   {
-    id: 'Q8',
+    id: 'Q2',
     text: 'Au Japon, on organise chaque année un concours appelé nakizumo. En quoi consiste-t-il?',
     choices: ['A) Une course de bébés à quatre pattes', 'B) Un concours du plus beau bébé', 'C) Un concours où le premier bébé à pleurer gagne', 'D) Un concours de lancer de couches'],
     answer: 'C',
@@ -26,7 +26,7 @@ export const QUESTIONS = [
     round: 1,
   },
   {
-    id: 'Q69',
+    id: 'Q3',
     text: 'En Islande, les noms de famille fonctionnent différemment de la plupart des pays. Comment?',
     choices: ['A) On prend le nom de famille de la mère uniquement', 'B) Le nom de famille change à chaque génération (patronyme/matronyme)', 'C) Il n\'y a pas de nom de famille du tout', 'D) On choisit un nouveau nom de famille à 18 ans'],
     answer: 'B',
@@ -35,16 +35,16 @@ export const QUESTIONS = [
     round: 1,
   },
   {
-    id: 'Q14',
-    text: 'En Allemagne, la fête traditionnelle après la naissance s\'appelle Babypinkeln (littéralement « pipi de bébé »). Historiquement, qu\'est-ce qui portait chance?',
+    id: 'Q4',
+    text: 'En Allemagne, la fête traditionnelle après la naissance s\'appelle Babypinkeln. Historiquement, qu\'est-ce qui portait chance?',
     choices: ['A) Verser de la bière sur la tête du bébé', 'B) Que le bébé nu urine sur quelqu\'un', 'C) Faire pipi dans la rivière la plus proche', 'D) Offrir un pot de chambre en argent'],
     answer: 'B',
-    explanation: 'Le Babypinkeln est une fête pour accueillir le nouveau-né. Historiquement, le bébé nu était passé de bras en bras et la personne sur qui il urinait était considérée comme bénie par la chance éternelle.',
+    explanation: 'Le Babypinkeln (littéralement « pipi de bébé ») est une fête pour accueillir le nouveau-né. Historiquement, le bébé nu était passé de bras en bras et la personne sur qui il urinait était considérée comme bénie par la chance éternelle.',
     theme: 'Traditions et rituels du monde',
     round: 1,
   },
   {
-    id: 'Q67',
+    id: 'Q5',
     text: 'Chez les Navajos (peuple autochtone d\'Amérique du Nord), quel événement du bébé donne lieu à une grande fête?',
     choices: ['A) Son premier mot', 'B) Sa première dent', 'C) Son premier rire', 'D) Son premier pas'],
     answer: 'C',
@@ -56,7 +56,7 @@ export const QUESTIONS = [
   // ===== ROUND 2 : Le corps incroyable du bébé =====
 
   {
-    id: 'Q28',
+    id: 'Q6',
     text: 'Avec combien d\'os un bébé naît-il, comparé aux 206 os d\'un adulte?',
     choices: ['A) ~180', 'B) ~220', 'C) ~270', 'D) ~300'],
     answer: 'D',
@@ -65,7 +65,7 @@ export const QUESTIONS = [
     round: 2,
   },
   {
-    id: 'Q35',
+    id: 'Q7',
     text: 'Les bébés possèdent une capacité unique que les adultes ont perdue. Laquelle?',
     choices: ['A) Respirer et avaler en même temps', 'B) Voir les rayons ultraviolets', 'C) Entendre les ultrasons', 'D) Régénérer des bouts de doigts'],
     answer: 'A',
@@ -74,16 +74,16 @@ export const QUESTIONS = [
     round: 2,
   },
   {
-    id: 'Q32',
+    id: 'Q8',
     text: 'À quelle distance un nouveau-né peut-il voir nettement?',
-    choices: ['A) 2 à 5 cm', 'B) 20 à 35 cm (8 à 14 pouces)', 'C) 1 à 2 mètres', 'D) Il voit normalement dès la naissance'],
+    choices: ['A) 2 à 5 cm', 'B) 20 à 35 cm', 'C) 1 à 2 mètres', 'D) Il voit normalement dès la naissance'],
     answer: 'B',
     explanation: '20 à 35 cm (8 à 14 pouces). C\'est précisément la distance entre le visage du bébé et celui de sa mère pendant l\'allaitement. Tout le reste est un flou de lumière et de formes. Leur acuité visuelle est d\'environ 20/200 à 20/400.',
     theme: 'Le corps incroyable du bébé',
     round: 2,
   },
   {
-    id: 'Q34',
+    id: 'Q9',
     text: 'À quelle vitesse le cerveau d\'un nouveau-né forme-t-il de nouvelles connexions neuronales dans les 3 premières années?',
     choices: ['A) ~1 000 par seconde', 'B) ~100 000 par seconde', 'C) ~1 million par seconde', 'D) ~10 millions par seconde'],
     answer: 'C',
@@ -92,11 +92,11 @@ export const QUESTIONS = [
     round: 2,
   },
   {
-    id: 'Q83',
+    id: 'Q10',
     text: 'Selon le psychologue Stanley Coren (UBC), les capacités cognitives d\'un chien adulte moyen sont comparables à celles d\'un enfant humain de quel âge?',
-    choices: ['A) 6 mois', 'B) 1 an', 'C) 2 à 2,5 ans', 'D) 5 ans'],
+    choices: ['A) 6 mois', 'B) 1 an', 'C) 2.5 ans', 'D) 5 ans'],
     answer: 'C',
-    explanation: '2 à 2,5 ans. Les capacités cognitives d\'un chien moyen (vocabulaire ~165 mots, comptage, conscience émotionnelle) sont comparables à celles d\'un enfant de 2 à 2,5 ans. Les chiens « surdoués » comme les Border Collies atteignent le niveau d\'un enfant de 3 ans. Donc oui, pendant ses 2 premières années, ton bébé est techniquement moins futé que ton chien.',
+    explanation: '2.5 ans. Les capacités cognitives d\'un chien moyen (vocabulaire ~165 mots, comptage, conscience émotionnelle) sont comparables à celles d\'un enfant de 2 à 2.5 ans. Les chiens « surdoués » comme les Border Collies atteignent le niveau d\'un enfant de 3 ans. Donc oui, pendant ses 2 premières années, ton bébé est techniquement moins futé que ton chien.',
     theme: 'Le corps incroyable du bébé',
     round: 2,
   },
@@ -104,7 +104,7 @@ export const QUESTIONS = [
   // ===== ROUND 3 : Parentalité autour du monde =====
 
   {
-    id: 'Q21',
+    id: 'Q11',
     text: 'Dans les pays scandinaves, notamment en Suède et en Norvège, quelle pratique courante surprend souvent les visiteurs étrangers?',
     choices: ['A) Les enfants apprennent à nager avant de marcher', 'B) Les bébés font la sieste dehors, même en hiver', 'C) Les parents ne donnent pas de nom avant 6 mois', 'D) Les enfants mangent seuls dès 4 mois'],
     answer: 'B',
@@ -113,7 +113,7 @@ export const QUESTIONS = [
     round: 3,
   },
   {
-    id: 'Q66',
+    id: 'Q12',
     text: 'En Allemagne, quelle contrainte importante existe-t-il pour le choix du prénom d\'un enfant?',
     choices: ['A) Le prénom doit être unisexe', 'B) Le prénom doit indiquer clairement le sexe de l\'enfant', 'C) Le prénom ne doit pas dépasser 6 lettres', 'D) Le prénom doit être d\'origine germanique'],
     answer: 'B',
@@ -122,7 +122,7 @@ export const QUESTIONS = [
     round: 3,
   },
   {
-    id: 'Q10',
+    id: 'Q13',
     text: 'En Finlande, le gouvernement offre depuis les années 1930 un cadeau à chaque nouveau parent. De quoi s\'agit-il?',
     choices: ['A) Un bon de 500 euros pour des vêtements', 'B) Une boîte en carton contenant ~60 articles essentiels pour bébé', 'C) Un abonnement d\'un an à un service de garde', 'D) Un arbre planté au nom de l\'enfant'],
     answer: 'B',
@@ -131,16 +131,16 @@ export const QUESTIONS = [
     round: 3,
   },
   {
-    id: 'Q27',
+    id: 'Q14',
     text: 'Au Japon, la plupart des femmes accouchent sans anesthésie (épidurale). Cette tradition vient de quelle croyance?',
-    choices: ['A) La douleur stimule la production de lait', 'B) L\'anesthésie affecte l\'intelligence du bébé', 'C) La douleur prépare la mère aux défis de la maternité (croyance bouddhiste)', 'D) C\'est une exigence légale'],
+    choices: ['A) La douleur stimule la production de lait', 'B) L\'anesthésie affecte l\'intelligence du bébé', 'C) La douleur prépare la mère aux défis de la maternité', 'D) C\'est une exigence légale'],
     answer: 'C',
     explanation: 'La douleur prépare la mère aux défis de la maternité (croyance bouddhiste). La plupart des Japonaises n\'envisagent pas l\'épidurale, même si leur médecin la recommande. Cette tradition vient de la croyance bouddhiste que les douleurs de l\'accouchement sont un test préparatoire.',
     theme: 'Parentalité autour du monde',
     round: 3,
   },
   {
-    id: 'Q25',
+    id: 'Q15',
     text: 'Quelle est la durée du congé de maternité payé en Bulgarie, un des plus généreux au monde?',
     choices: ['A) 6 mois', 'B) 1 an', 'C) 2 ans', 'D) 3 ans'],
     answer: 'C',
@@ -152,7 +152,7 @@ export const QUESTIONS = [
   // ===== ROUND 4 : Mythes, nature et instinct =====
 
   {
-    id: 'Q38',
+    id: 'Q16',
     text: 'VRAI ou FAUX : Les bébés peuvent goûter les saveurs des aliments que leur mère mange pendant la grossesse.',
     choices: ['A) Vrai', 'B) Faux'],
     answer: 'A',
@@ -161,16 +161,16 @@ export const QUESTIONS = [
     round: 4,
   },
   {
-    id: 'Q57',
+    id: 'Q17',
     text: 'Les kangourous ont une particularité unique pour gérer leur reproduction. Laquelle?',
-    choices: ['A) Ils peuvent suspendre le développement de l\'embryon (diapause)', 'B) Ils pondent un œuf avant la naissance', 'C) Le mâle porte le bébé les premiers jours', 'D) La femelle peut porter des jumeaux de pères différents'],
+    choices: ['A) Ils peuvent suspendre le développement de l\'embryon', 'B) Ils pondent un œuf avant la naissance', 'C) Le mâle porte le bébé les premiers jours', 'D) La femelle peut porter des jumeaux de pères différents'],
     answer: 'A',
     explanation: 'Ils peuvent suspendre le développement de l\'embryon (diapause). Les kangourous femelles peuvent mettre en pause le développement d\'un embryon si les conditions ne sont pas favorables (sécheresse, stress) ou si un autre petit occupe déjà la poche. L\'embryon reprend sa croissance quand les conditions s\'améliorent.',
     theme: 'Mythes, nature et instinct',
     round: 4,
   },
   {
-    id: 'Q39',
+    id: 'Q18',
     text: 'VRAI ou FAUX : Les bébés sourient volontairement dès la naissance quand ils sont contents.',
     choices: ['A) Vrai', 'B) Faux'],
     answer: 'B',
@@ -179,16 +179,16 @@ export const QUESTIONS = [
     round: 4,
   },
   {
-    id: 'Q54',
-    text: 'Quel animal a la période de « couvaison » la plus longue connue au monde — environ 4,5 ans?',
-    choices: ['A) L\'albatros royal', 'B) Le requin à collerette', 'C) La pieuvre des profondeurs (Graneledone boreopacifica)', 'D) La tortue géante des Galápagos'],
+    id: 'Q19',
+    text: 'Quel animal a la période de « couvaison » la plus longue connue au monde — environ 4.5 ans?',
+    choices: ['A) L\'albatros royal', 'B) Le requin à collerette', 'C) La pieuvre des profondeurs', 'D) La tortue géante des Galápagos'],
     answer: 'C',
-    explanation: 'La pieuvre des profondeurs (Graneledone boreopacifica). Une femelle a été observée couvant ses 160 œufs pendant 53 mois (4,5 ans) à 1 400 m de profondeur. Elle n\'a pas mangé de tout ce temps et est morte après l\'éclosion.',
+    explanation: 'La pieuvre des profondeurs (Graneledone boreopacifica). Une femelle a été observée couvant ses 160 œufs pendant 53 mois (4.5 ans) à 1 400 m de profondeur. Elle n\'a pas mangé de tout ce temps et est morte après l\'éclosion.',
     theme: 'Mythes, nature et instinct',
     round: 4,
   },
   {
-    id: 'Q43',
+    id: 'Q20',
     text: 'VRAI ou FAUX : Les bébés reconnaissent des chansons qu\'ils ont entendues dans le ventre de leur mère.',
     choices: ['A) Vrai', 'B) Faux'],
     answer: 'A',
@@ -200,7 +200,7 @@ export const QUESTIONS = [
   // ===== ROUND 5 : Science, inventions et sons =====
 
   {
-    id: 'Q93',
+    id: 'Q21',
     text: 'L\'incubateur pour bébés prématurés a été inventé grâce à l\'observation de quel animal dans un zoo parisien?',
     choices: ['A) Des singes dans leur habitat chauffé', 'B) Des poussins dans un incubateur à volaille', 'C) Des reptiles sous lampes chauffantes', 'D) Des oursons dans une tanière artificielle'],
     answer: 'B',
@@ -209,16 +209,16 @@ export const QUESTIONS = [
     round: 5,
   },
   {
-    id: 'Q94',
+    id: 'Q22',
     text: 'Au début du 20e siècle, le Dr Martin Couney a sauvé ~6 500 bébés prématurés aux États-Unis grâce à ses incubateurs. Où étaient installés ces incubateurs?',
-    choices: ['A) Dans les hôpitaux universitaires de New York', 'B) Dans des attractions de foire et parcs d\'amusement (Coney Island)', 'C) Dans des trains médicaux ambulants', 'D) Dans des églises converties en cliniques'],
+    choices: ['A) Dans les hôpitaux universitaires de New York', 'B) Dans des attractions de foire et parcs d\'amusement', 'C) Dans des trains médicaux ambulants', 'D) Dans des églises converties en cliniques'],
     answer: 'B',
     explanation: 'Dans des attractions de foire et parcs d\'amusement (Coney Island). Martin Couney a exploité des « Infantoriums » dans des parcs d\'amusement pendant plus de 40 ans (1903-1943), principalement à Coney Island et Atlantic City. Les hôpitaux de l\'époque refusaient de traiter les prématurés, considérés comme des « faibles » génétiquement inférieurs. Couney a sauvé environ 6 500 bébés avec un taux de survie de ~85 % — bien supérieur à celui des hôpitaux.',
     theme: 'Science, inventions et sons',
     round: 5,
   },
   {
-    id: 'Q59',
+    id: 'Q23',
     text: 'En quelle décennie la première échographie obstétricale a-t-elle été réalisée, permettant de « voir » un bébé in utero?',
     choices: ['A) Années 1930', 'B) Années 1950', 'C) Années 1970', 'D) Années 1990'],
     answer: 'B',
@@ -227,7 +227,7 @@ export const QUESTIONS = [
     round: 5,
   },
   {
-    id: 'Q102',
+    id: 'Q24',
     text: 'Dans l\'utérus, le liquide amniotique et les tissus agissent comme un filtre acoustique naturel. Quel type de filtre audio cela imite-t-il?',
     choices: ['A) Un filtre passe-haut (ne laisse passer que les aigus)', 'B) Un filtre passe-bas (ne laisse passer que les graves)', 'C) Un filtre passe-bande (ne laisse passer qu\'une fréquence)', 'D) Aucun filtrage — le bébé entend tout normalement'],
     answer: 'B',
@@ -236,7 +236,7 @@ export const QUESTIONS = [
     round: 5,
   },
   {
-    id: 'Q104',
+    id: 'Q25',
     text: 'Le bruit de fond constant que le bébé entend dans l\'utérus (battements de cœur, flux sanguin, digestion) est à quel niveau sonore approximatif?',
     choices: ['A) ~20 dB (bibliothèque silencieuse)', 'B) ~50 dB (conversation normale)', 'C) ~75-90 dB (aspirateur / restaurant bruyant)', 'D) ~110 dB (concert rock)'],
     answer: 'C',
@@ -248,7 +248,7 @@ export const QUESTIONS = [
   // ===== ROUND 6 : Dormir, pleurer, recommencer =====
 
   {
-    id: 'Q84',
+    id: 'Q26',
     text: 'Les cris d\'un bébé peuvent atteindre quel niveau sonore en décibels?',
     choices: ['A) 70 dB (aspirateur)', 'B) 85 dB (tondeuse à gazon)', 'C) 100-120 dB (sirène d\'ambulance / concert rock)', 'D) 140 dB (décollage d\'avion)'],
     answer: 'C',
@@ -257,7 +257,7 @@ export const QUESTIONS = [
     round: 6,
   },
   {
-    id: 'Q64',
+    id: 'Q27',
     text: 'Combien de couches un bébé moyen utilise-t-il environ pendant ses 2 premières années?',
     choices: ['A) ~2 000', 'B) ~4 000', 'C) ~6 000', 'D) ~8 000'],
     answer: 'C',
@@ -266,7 +266,7 @@ export const QUESTIONS = [
     round: 6,
   },
   {
-    id: 'Q82',
+    id: 'Q28',
     text: 'Un bébé allaité se réveille typiquement aux combien d\'heures pour boire dans les premières semaines?',
     choices: ['A) Toutes les heures', 'B) Toutes les 2 heures', 'C) Toutes les 4 heures', 'D) Toutes les 6 heures'],
     answer: 'B',
@@ -275,7 +275,7 @@ export const QUESTIONS = [
     round: 6,
   },
   {
-    id: 'Q71',
+    id: 'Q29',
     text: 'Selon une étude, combien d\'heures de sommeil les nouveaux parents perdent-ils en moyenne par nuit pendant la première année?',
     choices: ['A) ~1 heure', 'B) ~2 heures', 'C) ~3 heures', 'D) ~5 heures'],
     answer: 'C',
@@ -284,7 +284,7 @@ export const QUESTIONS = [
     round: 6,
   },
   {
-    id: 'Q72',
+    id: 'Q30',
     text: 'Selon une étude de l\'Université de Warwick, combien de temps faut-il après la naissance du premier enfant pour que le sommeil des parents se rétablisse complètement?',
     choices: ['A) 1 an', 'B) 2 ans', 'C) 4 ans', 'D) 6 ans'],
     answer: 'D',
@@ -296,16 +296,16 @@ export const QUESTIONS = [
   // ===== ROUND 7 : Couple, argent et sacrifices =====
 
   {
-    id: 'Q15',
+    id: 'Q31',
     text: 'Selon Statistique Canada, combien coûte en moyenne élever un enfant de la naissance à 17 ans dans une famille à revenu moyen (2 parents, 2 enfants)?',
-    choices: ['A) ~150 000 $', 'B) ~293 000 $', 'C) ~425 000 $', 'D) ~550 000 $'],
+    choices: ['A) ~150 000 $', 'B) ~300 000 $', 'C) ~425 000 $', 'D) ~550 000 $'],
     answer: 'B',
     explanation: '~293 000 $. Statistique Canada estime le coût à environ 293 000 $ CA (soit ~17 235 $ par année en moyenne). Ce montant exclut les études postsecondaires.',
     theme: 'Couple, argent et sacrifices',
     round: 7,
   },
   {
-    id: 'Q74',
+    id: 'Q32',
     text: 'Selon les études, quel pourcentage des couples vivent une forte baisse de satisfaction conjugale dans les deux années suivant la naissance d\'un enfant?',
     choices: ['A) 20 à 30 %', 'B) 40 à 50 %', 'C) 60 à 80 %', 'D) 90 %+'],
     answer: 'C',
@@ -314,25 +314,25 @@ export const QUESTIONS = [
     round: 7,
   },
   {
-    id: 'Q18',
+    id: 'Q33',
     text: 'De combien le coût total d\'élever un enfant augmente-t-il si l\'enfant reste à la maison jusqu\'à 22 ans (au lieu de 17)?',
-    choices: ['A) ~10 %', 'B) ~29 %', 'C) ~45 %', 'D) ~60 %'],
+    choices: ['A) ~10 %', 'B) ~30 %', 'C) ~45 %', 'D) ~60 %'],
     answer: 'B',
     explanation: '~29 %. Si les enfants restent au domicile familial entre 18 et 22 ans, le coût total augmente de près de 29 % par rapport à l\'estimation de base (naissance à 17 ans).',
     theme: 'Couple, argent et sacrifices',
     round: 7,
   },
   {
-    id: 'Q101',
+    id: 'Q34',
     text: 'Selon un sondage auprès de ~1 000 parents, la fréquence des rapports sexuels entre conjoints diminue en moyenne de combien après l\'arrivée d\'un enfant?',
-    choices: ['A) ~15 %', 'B) ~30 %', 'C) ~50 % (environ la moitié)', 'D) ~75 %'],
+    choices: ['A) ~15 %', 'B) ~30 %', 'C) ~50 %', 'D) ~75 %'],
     answer: 'C',
     explanation: '~50 % (environ la moitié). Selon un sondage de Leesa auprès d\'environ 1 000 parents, la fréquence moyenne passait de 19 fois par mois avant l\'enfant à 10 fois par mois après — une baisse d\'environ 50 %. Les parents avec un enfant de moins de 1 an sont les plus touchés : 46 % n\'ont des rapports que 1-2 fois par mois. La fréquence remonte graduellement à mesure que l\'enfant grandit. Fait intéressant : 61 % des mères rapportent une baisse de désir, contre 30 % des pères — mais 57 % des parents disent que la qualité du sexe, quand il arrive, est meilleure qu\'avant.',
     theme: 'Couple, argent et sacrifices',
     round: 7,
   },
   {
-    id: 'Q88',
+    id: 'Q35',
     text: 'Dans les sondages scientifiques menés aux États-Unis et en Allemagne, quel pourcentage de parents déclarent regretter d\'avoir eu des enfants?',
     choices: ['A) ~1-2 %', 'B) ~7-8 %', 'C) ~20-25 %', 'D) ~35 %'],
     answer: 'B',
@@ -344,7 +344,7 @@ export const QUESTIONS = [
   // ===== ROUND 8 : Chiffres surprenants =====
 
   {
-    id: 'Q48',
+    id: 'Q36',
     text: 'De combien un bébé moyen multiplie-t-il son poids de naissance au cours de sa première année?',
     choices: ['A) Il double', 'B) Il triple', 'C) Il quadruple', 'D) Il quintuple'],
     answer: 'B',
@@ -353,34 +353,34 @@ export const QUESTIONS = [
     round: 8,
   },
   {
-    id: 'Q92',
+    id: 'Q37',
     text: 'Selon l\'Institut de la statistique du Québec (ISQ), en 2024, quel pourcentage des bébés nés au Québec avaient au moins un parent né à l\'étranger?',
     choices: ['A) ~15 %', 'B) ~25 %', 'C) ~40 %', 'D) ~55 %'],
     answer: 'C',
-    explanation: '~40 %. Selon le bilan démographique 2024 de l\'ISQ, 40 % des bébés nés au Québec en 2024 avaient au moins un parent né à l\'étranger, un phénomène en hausse constante. Par ailleurs, l\'indice de fécondité du Québec a atteint un creux historique de 1,33 enfant par femme en 2024, et pour la première fois, les décès (78 800) ont dépassé les naissances (77 400).',
+    explanation: '~40 %. Selon le bilan démographique 2024 de l\'ISQ, 40 % des bébés nés au Québec en 2024 avaient au moins un parent né à l\'étranger, un phénomène en hausse constante. Par ailleurs, l\'indice de fécondité du Québec a atteint un creux historique de 1.33 enfant par femme en 2024, et pour la première fois, les décès (78 800) ont dépassé les naissances (77 400).',
     theme: 'Chiffres surprenants',
     round: 8,
   },
   {
-    id: 'Q91',
+    id: 'Q38',
     text: 'Au Québec, la prévalence à vie du TDAH (trouble du déficit de l\'attention avec ou sans hyperactivité) chez les jeunes de 1 à 24 ans est d\'environ combien?',
     choices: ['A) ~3 %', 'B) ~7 %', 'C) ~11 %', 'D) ~18 %'],
     answer: 'C',
-    explanation: '~11 %. Selon l\'INSPQ, la prévalence à vie du TDAH diagnostiqué chez les 1-24 ans au Québec s\'établissait à 11,3 % en 2015-2016, avec un ratio de deux garçons pour une fille. Le Québec affiche l\'un des taux de diagnostic les plus élevés au Canada. Fait intéressant : les enfants nés en septembre (juste avant l\'entrée scolaire du 1er octobre) sont significativement plus diagnostiqués que ceux nés en octobre — la « maturité » vs l\'immaturité relative dans une classe jouant un rôle.',
+    explanation: '~11 %. Selon l\'INSPQ, la prévalence à vie du TDAH diagnostiqué chez les 1-24 ans au Québec s\'établissait à 11.3 % en 2015-2016, avec un ratio de deux garçons pour une fille. Le Québec affiche l\'un des taux de diagnostic les plus élevés au Canada. Fait intéressant : les enfants nés en septembre (juste avant l\'entrée scolaire du 1er octobre) sont significativement plus diagnostiqués que ceux nés en octobre — la « maturité » vs l\'immaturité relative dans une classe jouant un rôle.',
     theme: 'Chiffres surprenants',
     round: 8,
   },
   {
-    id: 'Q114',
+    id: 'Q39',
     text: 'Le taux de diplomation au secondaire au Québec est significativement différent entre le privé et le public. Quels sont les taux respectifs approximatifs?',
     choices: ['A) Privé : 85 % / Public : 80 %', 'B) Privé : 93 % / Public : 77 %', 'C) Privé : 97 % / Public : 85 %', 'D) Privé : 99 % / Public : 90 %'],
     answer: 'B',
-    explanation: 'Privé : 93 % / Public : 77 %. Le taux de diplomation au secondaire est de 93,1 % dans le réseau privé contre 76,5 % dans le public. Attention au biais de sélection : les écoles privées sélectionnent souvent leurs élèves à l\'entrée et desservent des familles en moyenne plus aisées.',
+    explanation: 'Privé : 93 % / Public : 77 %. Le taux de diplomation au secondaire est de 93.1 % dans le réseau privé contre 76.5 % dans le public. Attention au biais de sélection : les écoles privées sélectionnent souvent leurs élèves à l\'entrée et desservent des familles en moyenne plus aisées.',
     theme: 'Chiffres surprenants',
     round: 8,
   },
   {
-    id: 'Q75',
+    id: 'Q40',
     text: 'Au Québec, quel pourcentage des jeunes adultes de 20 à 34 ans vivaient encore chez leurs parents (recensement 2016)?',
     choices: ['A) ~15 %', 'B) ~30 %', 'C) ~42 %', 'D) ~55 %'],
     answer: 'B',
@@ -397,7 +397,7 @@ export const EXTRA_QUESTIONS = [
   // --- Extra A : Petites curiosités ---
 
   {
-    id: 'Q7',
+    id: 'Q41',
     text: 'Avant l\'invention du biberon en verre au 19e siècle, quel objet était couramment utilisé pour nourrir les bébés qui ne pouvaient pas être allaités?',
     choices: ['A) Une corne d\'animal percée', 'B) Un gant en cuir imbibé de lait', 'C) Un tube en plomb', 'D) Une éponge attachée à un bâton'],
     answer: 'A',
@@ -406,7 +406,7 @@ export const EXTRA_QUESTIONS = [
     extra: 'A',
   },
   {
-    id: 'Q29',
+    id: 'Q42',
     text: 'Les nouveau-nés pleurent, mais sans produire de vraies larmes. À partir de quel âge les larmes apparaissent-elles?',
     choices: ['A) Dès la naissance', 'B) Environ 2 à 4 semaines', 'C) Environ 3 mois', 'D) Environ 6 mois'],
     answer: 'B',
@@ -415,7 +415,7 @@ export const EXTRA_QUESTIONS = [
     extra: 'A',
   },
   {
-    id: 'Q31',
+    id: 'Q43',
     text: 'Combien de papilles gustatives un nouveau-né possède-t-il environ?',
     choices: ['A) ~5 000 (comme un adulte)', 'B) ~10 000', 'C) ~20 000', 'D) ~30 000'],
     answer: 'D',
@@ -424,7 +424,7 @@ export const EXTRA_QUESTIONS = [
     extra: 'A',
   },
   {
-    id: 'Q46',
+    id: 'Q44',
     text: 'Au Canada, quel mois de l\'année voit naître le plus de bébés?',
     choices: ['A) Janvier', 'B) Mai', 'C) Juillet', 'D) Septembre'],
     answer: 'D',
@@ -433,7 +433,7 @@ export const EXTRA_QUESTIONS = [
     extra: 'A',
   },
   {
-    id: 'Q49',
+    id: 'Q45',
     text: 'Au Danemark, les parents doivent choisir le prénom de leur bébé à partir d\'une liste officielle. Combien de prénoms contient-elle environ?',
     choices: ['A) ~500', 'B) ~3 000', 'C) ~7 000', 'D) ~15 000'],
     answer: 'C',
@@ -445,7 +445,7 @@ export const EXTRA_QUESTIONS = [
   // --- Extra B : Sommeil, mémoire et survie ---
 
   {
-    id: 'Q76',
+    id: 'Q46',
     text: 'Combien de fois en moyenne les nouveaux parents sont-ils réveillés par leur bébé par nuit pendant la première année?',
     choices: ['A) ~1 fois', 'B) ~3 fois', 'C) ~5 fois', 'D) ~8 fois'],
     answer: 'B',
@@ -454,7 +454,7 @@ export const EXTRA_QUESTIONS = [
     extra: 'B',
   },
   {
-    id: 'Q79',
+    id: 'Q47',
     text: 'À 2 mois, quel pourcentage des bébés dorment au moins 5-6 heures d\'affilée la nuit?',
     choices: ['A) ~5 %', 'B) ~25 %', 'C) ~50 %', 'D) ~75 %'],
     answer: 'B',
@@ -463,7 +463,7 @@ export const EXTRA_QUESTIONS = [
     extra: 'B',
   },
   {
-    id: 'Q81',
+    id: 'Q48',
     text: 'Les études montrent que la satisfaction conjugale revient en moyenne à son niveau d\'avant bébé après combien de temps?',
     choices: ['A) 6 mois', 'B) 1 an', 'C) 2 ans', 'D) Jamais vraiment'],
     answer: 'C',
@@ -472,16 +472,16 @@ export const EXTRA_QUESTIONS = [
     extra: 'B',
   },
   {
-    id: 'Q85',
+    id: 'Q49',
     text: 'L\'« amnésie infantile » fait que les adultes ne se souviennent généralement pas d\'événements avant quel âge?',
     choices: ['A) 1 an', 'B) 2-3 ans', 'C) 3-4 ans', 'D) 5-6 ans'],
     answer: 'C',
-    explanation: '3-4 ans. L\'amnésie infantile est un phénomène robuste documenté depuis plus d\'un siècle : chez les adultes occidentaux, l\'âge moyen du premier souvenir autobiographique se situe entre 3 et 3,5 ans.',
+    explanation: '3-4 ans. L\'amnésie infantile est un phénomène robuste documenté depuis plus d\'un siècle : chez les adultes occidentaux, l\'âge moyen du premier souvenir autobiographique se situe entre 3 et 3.5 ans.',
     theme: 'Sommeil, mémoire et survie',
     extra: 'B',
   },
   {
-    id: 'Q90',
+    id: 'Q50',
     text: 'À partir de quel âge environ les premiers souvenirs d\'un enfant commencent-ils à s\'effacer de façon permanente (début de l\'amnésie infantile)?',
     choices: ['A) 3 ans', 'B) 5 ans', 'C) 7 ans', 'D) 10 ans'],
     answer: 'C',
@@ -493,7 +493,7 @@ export const EXTRA_QUESTIONS = [
   // --- Extra C : Le Québec en chiffres ---
 
   {
-    id: 'Q16',
+    id: 'Q51',
     text: 'Quelle est la catégorie de dépense la plus importante pour élever un enfant au Canada?',
     choices: ['A) La nourriture', 'B) Les vêtements', 'C) Le logement', 'D) La garde d\'enfants'],
     answer: 'C',
@@ -502,7 +502,7 @@ export const EXTRA_QUESTIONS = [
     extra: 'C',
   },
   {
-    id: 'Q19',
+    id: 'Q52',
     text: 'En 2025, quel pourcentage des enfants canadiens de 0 à 5 ans fréquentent une forme de service de garde?',
     choices: ['A) 32 %', 'B) 45 %', 'C) 58 %', 'D) 74 %'],
     answer: 'C',
@@ -511,7 +511,7 @@ export const EXTRA_QUESTIONS = [
     extra: 'C',
   },
   {
-    id: 'Q78',
+    id: 'Q53',
     text: 'Au Québec, les couples en union libre représentent une réalité distincte. Parmi les enfants québécois, environ quel pourcentage naissent de parents en union libre (non mariés)?',
     choices: ['A) ~25 %', 'B) ~40 %', 'C) ~63 %', 'D) ~80 %'],
     answer: 'C',
@@ -520,7 +520,7 @@ export const EXTRA_QUESTIONS = [
     extra: 'C',
   },
   {
-    id: 'Q110',
+    id: 'Q54',
     text: 'Au Québec, en mai 2025, combien d\'enfants étaient en attente d\'une place en garderie (besoin immédiat)?',
     choices: ['A) ~5 000', 'B) ~15 000', 'C) ~31 000', 'D) ~60 000'],
     answer: 'C',
@@ -529,7 +529,7 @@ export const EXTRA_QUESTIONS = [
     extra: 'C',
   },
   {
-    id: 'Q111',
+    id: 'Q55',
     text: 'Selon un sondage de l\'organisme Ma place au travail (2025), quel pourcentage des familles québécoises rencontrent un délai entre la date souhaitée et l\'obtention réelle d\'une place en garderie?',
     choices: ['A) ~25 %', 'B) ~50 %', 'C) ~75 %', 'D) ~90 %'],
     answer: 'C',
@@ -541,8 +541,8 @@ export const EXTRA_QUESTIONS = [
   // --- Extra D : Varia ---
 
   {
-    id: 'Q89',
-    text: 'Les chercheurs ont documenté un phénomène appelé « l\'effet Flynn inverse ». De quoi s\'agit-il?',
+    id: 'Q56',
+    text: 'Les chercheurs ont documenté un phénomène appelé « l\'effet Flynn inversé ». De quoi s\'agit-il?',
     choices: ['A) Les enfants apprennent à lire de plus en plus tôt', 'B) Le QI moyen des populations a commencé à diminuer dans plusieurs pays occidentaux', 'C) Les bébés naissent avec un cerveau plus gros qu\'avant', 'D) L\'intelligence émotionnelle des enfants a doublé en 50 ans'],
     answer: 'B',
     explanation: 'Le QI moyen des populations a commencé à diminuer dans plusieurs pays occidentaux. L\'« effet Flynn » décrit l\'augmentation continue du QI observée pendant le 20e siècle (~3 points par décennie). Depuis les années 1990-2000, des études en Norvège, au Danemark, en Finlande et au Royaume-Uni montrent une inversion de cette tendance.',
@@ -550,7 +550,7 @@ export const EXTRA_QUESTIONS = [
     extra: 'D',
   },
   {
-    id: 'Q99',
+    id: 'Q57',
     text: 'En 1906, Cremer a réalisé une première mondiale en médecine fœtale. De quoi s\'agissait-il?',
     choices: ['A) La première photographie d\'un fœtus in utero', 'B) La première mesure électronique d\'un battement de cœur fœtal', 'C) La première transfusion sanguine in utero', 'D) La première chirurgie fœtale'],
     answer: 'B',
@@ -559,7 +559,7 @@ export const EXTRA_QUESTIONS = [
     extra: 'D',
   },
   {
-    id: 'Q103',
+    id: 'Q58',
     text: 'Un bébé dans le ventre commence à entendre des sons vers 22-24 semaines. Quelles sont les premières fréquences qu\'il perçoit?',
     choices: ['A) Les basses fréquences (~250-500 Hz) — voix grave du papa, basse, battements de cœur', 'B) Les hautes fréquences (~4000-8000 Hz) — aigus, cymbales', 'C) Toutes les fréquences en même temps', 'D) Uniquement la voix de la mère'],
     answer: 'A',
@@ -568,7 +568,7 @@ export const EXTRA_QUESTIONS = [
     extra: 'D',
   },
   {
-    id: 'Q106',
+    id: 'Q59',
     text: 'Au Québec, un siège d\'auto pour enfant est obligatoire par la loi jusqu\'à quel âge ou quelle taille?',
     choices: ['A) Jusqu\'à 4 ans', 'B) Jusqu\'à 6 ans ou 63 cm en position assise', 'C) Jusqu\'à 9 ans ou 145 cm', 'D) Jusqu\'à 12 ans'],
     answer: 'C',
@@ -577,7 +577,7 @@ export const EXTRA_QUESTIONS = [
     extra: 'D',
   },
   {
-    id: 'Q113',
+    id: 'Q60',
     text: 'Combien coûtent approximativement les frais de scolarité annuels d\'une école privée subventionnée au secondaire au Québec?',
     choices: ['A) ~1 500 à 2 500 $', 'B) ~3 000 à 5 200 $', 'C) ~7 000 à 10 000 $', 'D) ~12 000 à 15 000 $'],
     answer: 'B',
