@@ -121,7 +121,7 @@ body {
 }
 .question-screen.active {
   display: grid;
-  grid-template-columns: 380px 1fr;
+  grid-template-columns: 440px 1fr;
 }
 
 /* Colonne gauche : joueurs */
