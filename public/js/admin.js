@@ -4,7 +4,8 @@ import { PLAYERS, createToken, getPlayerById } from './players.js';
 import { QUESTIONS } from './questions.js';
 import { QuizEngine, getRanking } from './quiz-engine.js';
 import { initDB, dbSet, dbGet, dbListen } from './db.js';
-import { playRoundMusic, playFile, playSting, fadeOut, stop as stopMusic, setVolume, getVolume, isPlaying } from './music.js';
+// La musique joue depuis la vue TV (castée). L'admin envoie des commandes via Firebase.
+let _musicPlaying = false;
 
 const engine = new QuizEngine(QUESTIONS, PLAYERS);
 
@@ -200,19 +201,15 @@ engine.on('phase-change', (phase) => {
     renderVoteStatus();
     clearVotes();
   }
-  // Musique d'ambiance automatique
+  // Musique — commandes envoyées à la vue TV via Firebase
   if (phase === 'round-intro') {
-    playRoundMusic(engine.currentRoundNumber);
+    dbSet('music', { command: 'play-round', round: engine.currentRoundNumber });
   } else if (phase === 'reveal') {
-    stopMusic();
-    playSting('reveal');
+    dbSet('music', { command: 'reveal' });
   } else if (phase === 'final') {
-    stopMusic();
-    playFile('assets/music/final.mp3', { loop: true });
-  } else if (phase === 'scores') {
-    stopMusic();
-  } else if (phase === 'lobby') {
-    stopMusic();
+    dbSet('music', { command: 'final' });
+  } else if (phase === 'scores' || phase === 'lobby') {
+    dbSet('music', { command: 'stop' });
   }
   syncState();
 });
@@ -387,33 +384,25 @@ btnConnectAll.addEventListener('click', connectAllPlayers);
 btnRandomVotes.addEventListener('click', simulateRandomVotes);
 btnReset.addEventListener('click', resetQuiz);
 btnJeopardy.addEventListener('click', () => {
-  if (isPlaying()) {
-    stopMusic();
+  _musicPlaying = !_musicPlaying;
+  if (_musicPlaying) {
+    dbSet('music', { command: 'jeopardy' });
+    btnJeopardy.textContent = 'Stop Jeopardy';
+  } else {
+    dbSet('music', { command: 'stop' });
     btnJeopardy.textContent = 'Jeopardy';
-    return;
   }
-  playFile('assets/jeopardy.mp3', {
-    onEnded: () => { btnJeopardy.textContent = 'Jeopardy'; }
-  });
-  btnJeopardy.textContent = 'Stop Jeopardy';
 });
 
 btnMute.addEventListener('click', () => {
   _muted = !_muted;
-  if (_muted) {
-    setVolume(0);
-    btnMute.textContent = 'Unmute';
-  } else {
-    setVolume(_savedVolume);
-    btnMute.textContent = 'Mute musique';
-  }
+  dbSet('music/muted', _muted);
+  btnMute.textContent = _muted ? 'Unmute' : 'Mute';
 });
 
 volumeSlider.addEventListener('input', (e) => {
   _savedVolume = e.target.value / 100;
-  if (!_muted) {
-    setVolume(_savedVolume);
-  }
+  dbSet('music/volume', _savedVolume);
 });
 
 // --- Boot ---

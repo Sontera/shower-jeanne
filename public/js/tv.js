@@ -4,6 +4,7 @@ import { PLAYERS, createToken, updateTokenMood, getPlayerById } from './players.
 import { QUESTIONS } from './questions.js';
 import { getRanking } from './quiz-engine.js';
 import { initDB, dbListen } from './db.js';
+import { playRoundMusic, playFile, playSting, stop as stopMusic, setVolume } from './music.js';
 
 // --- Screens ---
 
@@ -350,6 +351,42 @@ async function boot() {
   dbListen('state/revealResults', (results) => {
     if (results && currentState) {
       renderReveal(currentState.currentQuestion, results);
+    }
+  });
+
+  // Écouter les commandes musicales de l'admin
+  let lastMusicCommand = null;
+  dbListen('music', (music) => {
+    if (!music) return;
+
+    // Volume et mute
+    if (music.volume != null) setVolume(music.muted ? 0 : music.volume);
+    if (music.muted === true) setVolume(0);
+
+    // Commandes
+    const cmd = music.command;
+    if (cmd === lastMusicCommand) return;
+    lastMusicCommand = cmd;
+
+    switch (cmd) {
+      case 'play-round':
+        playRoundMusic(music.round || 1);
+        break;
+      case 'reveal':
+        stopMusic();
+        playSting('reveal');
+        break;
+      case 'final':
+        stopMusic();
+        playFile('assets/music/final.mp3', { loop: true });
+        break;
+      case 'jeopardy':
+        stopMusic();
+        playFile('assets/jeopardy.mp3');
+        break;
+      case 'stop':
+        stopMusic();
+        break;
     }
   });
 

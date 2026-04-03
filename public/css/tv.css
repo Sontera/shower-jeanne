@@ -103,6 +103,18 @@ body {
   animation: fade-in 0.5s ease both;
 }
 
+.btn-enable-audio {
+  padding: 12px 32px;
+  border: 2px solid var(--accent);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--accent);
+  font-family: var(--font);
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 /* ============================================================
    ROUND INTRO
    ============================================================ */
