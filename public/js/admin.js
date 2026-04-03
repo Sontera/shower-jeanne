@@ -382,20 +382,33 @@ btnConnectAll.addEventListener('click', connectAllPlayers);
 btnRandomVotes.addEventListener('click', simulateRandomVotes);
 btnReset.addEventListener('click', resetQuiz);
 btnJeopardy.addEventListener('click', () => {
+  // Si déjà en lecture, arrêter
   if (_jeopardyAudio && !_jeopardyAudio.paused) {
     _jeopardyAudio.pause();
     _jeopardyAudio.currentTime = 0;
+    _jeopardyAudio = null;
     btnJeopardy.textContent = 'Jeopardy';
     return;
   }
-  stopMusic(); // arrêter la musique d'ambiance
+  // Arrêter la musique d'ambiance d'abord
+  stopMusic();
+  // Créer l'audio une seule fois, attendre qu'il soit prêt
   _jeopardyAudio = new Audio('assets/jeopardy.mp3');
   _jeopardyAudio.volume = _muted ? 0 : _savedVolume;
-  _jeopardyAudio.play();
-  btnJeopardy.textContent = 'Stop Jeopardy';
   _jeopardyAudio.addEventListener('ended', () => {
     btnJeopardy.textContent = 'Jeopardy';
+    _jeopardyAudio = null;
   });
+  const playPromise = _jeopardyAudio.play();
+  if (playPromise !== undefined) {
+    playPromise.then(() => {
+      btnJeopardy.textContent = 'Stop Jeopardy';
+    }).catch((err) => {
+      console.warn('[admin] Jeopardy play failed:', err.message);
+      btnJeopardy.textContent = 'Jeopardy';
+      _jeopardyAudio = null;
+    });
+  }
 });
 
 btnMute.addEventListener('click', () => {

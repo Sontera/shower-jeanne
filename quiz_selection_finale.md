@@ -168,7 +168,7 @@ Source : `quiz_shower_bebe.md` (115 questions), filtrées par les résultats du 
 
 - A) La douleur stimule la production de lait
 - B) L'anesthésie affecte l'intelligence du bébé
-- C) La douleur prépare la mère aux défis de la maternité (croyance bouddhiste)
+- C) La douleur prépare la mère aux défis de la maternité
 - D) C'est une exigence légale
 
 > **Réponse : C)** La douleur prépare la mère aux défis de la maternité (croyance bouddhiste). La plupart des Japonaises n'envisagent pas l'épidurale, même si leur médecin la recommande. Cette tradition vient de la croyance bouddhiste que les douleurs de l'accouchement sont un test préparatoire.
@@ -201,7 +201,7 @@ Source : `quiz_shower_bebe.md` (115 questions), filtrées par les résultats du 
 
 **Q17.** Les kangourous ont une particularité unique pour gérer leur reproduction. Laquelle?
 
-- A) Ils peuvent suspendre le développement de l'embryon (diapause)
+- A) Ils peuvent suspendre le développement de l'embryon
 - B) Ils pondent un œuf avant la naissance
 - C) Le mâle porte le bébé les premiers jours
 - D) La femelle peut porter des jumeaux de pères différents
@@ -223,7 +223,7 @@ Source : `quiz_shower_bebe.md` (115 questions), filtrées par les résultats du 
 
 - A) L'albatros royal
 - B) Le requin à collerette
-- C) La pieuvre des profondeurs (*Graneledone boreopacifica*)
+- C) La pieuvre des profondeurs
 - D) La tortue géante des Galápagos
 
 > **Réponse : C)** La pieuvre des profondeurs (*Graneledone boreopacifica*). Une femelle a été observée couvant ses 160 œufs pendant 53 mois (4.5 ans) à 1 400 m de profondeur. Elle n'a pas mangé de tout ce temps et est morte après l'éclosion.
@@ -257,7 +257,7 @@ Source : `quiz_shower_bebe.md` (115 questions), filtrées par les résultats du 
 **Q22.** Au début du 20e siècle, le Dr Martin Couney a sauvé ~6 500 bébés prématurés aux États-Unis grâce à ses incubateurs. Où étaient installés ces incubateurs?
 
 - A) Dans les hôpitaux universitaires de New York
-- B) Dans des attractions de foire et parcs d'amusement (Coney Island)
+- B) Dans des attractions de foire et parcs d'amusement
 - C) Dans des trains médicaux ambulants
 - D) Dans des églises converties en cliniques
 
@@ -364,7 +364,7 @@ Source : `quiz_shower_bebe.md` (115 questions), filtrées par les résultats du 
 **Q31.** Selon Statistique Canada, combien coûte en moyenne élever un enfant de la naissance à 17 ans dans une famille à revenu moyen (2 parents, 2 enfants)?
 
 - A) ~150 000 $
-- B) ~293 000 $
+- B) ~300 000 $
 - C) ~425 000 $
 - D) ~550 000 $
 
@@ -386,7 +386,7 @@ Source : `quiz_shower_bebe.md` (115 questions), filtrées par les résultats du 
 **Q33.** De combien le coût total d'élever un enfant augmente-t-il si l'enfant reste à la maison jusqu'à 22 ans (au lieu de 17)?
 
 - A) ~10 %
-- B) ~29 %
+- B) ~30 %
 - C) ~45 %
 - D) ~60 %
 
@@ -398,7 +398,7 @@ Source : `quiz_shower_bebe.md` (115 questions), filtrées par les résultats du 
 
 - A) ~15 %
 - B) ~30 %
-- C) ~50 % (environ la moitié)
+- C) ~50 %
 - D) ~75 %
 
 > **Réponse : C)** ~50 % (environ la moitié). Selon un sondage de Leesa auprès d'environ 1 000 parents, la fréquence moyenne passait de 19 fois par mois avant l'enfant à 10 fois par mois après — une baisse d'environ 50 %. Les parents avec un enfant de moins de 1 an sont les plus touchés : 46 % n'ont des rapports que 1-2 fois par mois. La fréquence remonte graduellement à mesure que l'enfant grandit. Fait intéressant : 61 % des mères rapportent une baisse de désir, contre 30 % des pères — mais 57 % des parents disent que la qualité du sexe, quand il arrive, est *meilleure* qu'avant.
