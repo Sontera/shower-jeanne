@@ -1,5 +1,6 @@
 // db.js — Couche d'abstraction Firebase Realtime Database
 //
+// Utilise l'API compat Firebase chargée via <script> dans le HTML.
 // Chemins Firebase:
 //   quiz/state/    — écrit par l'admin (phase, currentQuestion, scores, revealResults)
 //   quiz/votes/    — écrit par les joueurs ({playerId}: "B")
@@ -7,16 +8,10 @@
 
 import { FIREBASE_CONFIG, OFFLINE_MODE } from './firebase-config.js';
 
-// Modules Firebase pré-chargés à l'init
 let _db = null;
-let _fbRef = null;
-let _fbSet = null;
-let _fbGet = null;
-let _fbOnValue = null;
-let _fbOff = null;
 
 /**
- * Initialise la connexion Firebase. Doit être appelé avant toute autre opération.
+ * Initialise la connexion Firebase.
  */
 export async function initDB() {
   if (OFFLINE_MODE) {
@@ -24,40 +19,35 @@ export async function initDB() {
     return;
   }
 
-  const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js');
-  const fbDb = await import('https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js');
-
-  const app = initializeApp(FIREBASE_CONFIG);
-  _db = fbDb.getDatabase(app);
-  _fbRef = fbDb.ref;
-  _fbSet = fbDb.set;
-  _fbGet = fbDb.get;
-  _fbOnValue = fbDb.onValue;
-  _fbOff = fbDb.off;
-
-  console.log('[db] Firebase connecté');
+  try {
+    firebase.initializeApp(FIREBASE_CONFIG);
+    _db = firebase.database();
+    console.log('[db] Firebase connecté');
+  } catch (e) {
+    console.error('[db] Erreur Firebase:', e);
+  }
 }
 
 /**
  * Écrire une valeur.
  */
 export async function dbSet(path, value) {
-  if (OFFLINE_MODE) {
+  if (OFFLINE_MODE || !_db) {
     _localStore[path] = value;
     _notifyLocal(path, value);
     return;
   }
-  await _fbSet(_fbRef(_db, `quiz/${path}`), value);
+  await _db.ref(`quiz/${path}`).set(value);
 }
 
 /**
  * Lire une valeur (one-shot).
  */
 export async function dbGet(path) {
-  if (OFFLINE_MODE) {
+  if (OFFLINE_MODE || !_db) {
     return _localStore[path] ?? null;
   }
-  const snap = await _fbGet(_fbRef(_db, `quiz/${path}`));
+  const snap = await _db.ref(`quiz/${path}`).once('value');
   return snap.val();
 }
 
@@ -66,7 +56,7 @@ export async function dbGet(path) {
  * @returns {function} unsubscribe
  */
 export function dbListen(path, callback) {
-  if (OFFLINE_MODE) {
+  if (OFFLINE_MODE || !_db) {
     if (!_localListeners[path]) _localListeners[path] = [];
     _localListeners[path].push(callback);
     if (path in _localStore) callback(_localStore[path]);
@@ -75,9 +65,10 @@ export function dbListen(path, callback) {
     };
   }
 
-  const refObj = _fbRef(_db, `quiz/${path}`);
-  _fbOnValue(refObj, (snap) => callback(snap.val()));
-  return () => _fbOff(refObj);
+  const ref = _db.ref(`quiz/${path}`);
+  const handler = (snap) => callback(snap.val());
+  ref.on('value', handler);
+  return () => ref.off('value', handler);
 }
 
 // --- Local store (mode offline) ---
