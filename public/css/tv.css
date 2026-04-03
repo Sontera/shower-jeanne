@@ -336,6 +336,12 @@ body {
   --token-font-size: 1.5rem;
   padding-left: 18px;
   gap: 12px;
+  width: 280px;
+  min-width: 280px;
+}
+
+.score-row .player-token--admin .token-name {
+  flex: 1;
 }
 
 .score-bar {
