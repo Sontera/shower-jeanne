@@ -116,28 +116,36 @@ h1 {
 /* Info question en cours */
 .current-question-info {
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: 2px solid var(--accent);
   border-radius: 12px;
-  padding: 20px;
+  padding: 24px;
   margin-bottom: 20px;
 }
 
 .current-question-info h3 {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--text-muted);
-  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
 }
 
 .current-question-info .q-text {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 8px;
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1.4;
+  margin-bottom: 12px;
+  color: var(--text);
 }
 
 .current-question-info .q-answer {
-  font-size: 0.95rem;
+  font-size: 1.15rem;
   color: var(--correct);
-  font-weight: 600;
+  font-weight: 800;
+  background: var(--correct-light);
+  padding: 10px 14px;
+  border-radius: 8px;
+  border-left: 4px solid var(--correct);
 }
 
 /* Statut des votes */

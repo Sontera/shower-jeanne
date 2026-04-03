@@ -26,7 +26,7 @@ body {
 }
 
 .join-screen h1 {
-  font-size: 1.7rem;
+  font-size: 2rem;
   font-weight: 800;
   color: var(--accent-dark);
 }
@@ -82,7 +82,7 @@ body {
 .waiting-screen.active { display: flex; }
 
 .waiting-screen p {
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   font-weight: 600;
   color: var(--text-muted);
 }
@@ -97,7 +97,7 @@ body {
 .vote-screen.active { display: flex; }
 
 .vote-question {
-  font-size: 1.2rem;
+  font-size: 1.45rem;
   font-weight: 700;
   line-height: 1.4;
   padding: 14px 0;
@@ -117,7 +117,7 @@ body {
   border-radius: 16px;
   background: var(--surface);
   font-family: var(--font);
-  font-size: 1.15rem;
+  font-size: 1.3rem;
   font-weight: 600;
   line-height: 1.4;
   padding: 16px 20px;
@@ -166,7 +166,7 @@ body {
 }
 
 .voted-screen p {
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   font-weight: 700;
 }
 
@@ -203,19 +203,19 @@ body {
 }
 
 .result-answer {
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   color: var(--text-muted);
   font-weight: 600;
 }
 
 .result-score {
-  font-size: 1.7rem;
+  font-size: 2rem;
   font-weight: 800;
   color: var(--text);
 }
 
 .result-rank {
-  font-size: 1.15rem;
+  font-size: 1.3rem;
   font-weight: 700;
   color: var(--accent-dark);
   background: var(--accent-light);

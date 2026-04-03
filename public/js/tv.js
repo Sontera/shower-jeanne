@@ -274,8 +274,27 @@ function onStateChange(state) {
 
 // --- Boot ---
 
+function renderQRCode() {
+  const playUrl = location.origin + '/play';
+  const container = document.getElementById('qr-code');
+  container.innerHTML = '';
+  try {
+    const qr = qrcode(0, 'M');
+    qr.addData(playUrl);
+    qr.make();
+    container.innerHTML = qr.createImgTag(6, 0);
+    const urlLabel = document.createElement('span');
+    urlLabel.className = 'lobby-qr-url';
+    urlLabel.textContent = playUrl.replace('https://', '');
+    container.appendChild(urlLabel);
+  } catch (e) {
+    container.textContent = playUrl;
+  }
+}
+
 async function boot() {
   await initDB();
+  renderQRCode();
 
   dbListen('state', onStateChange);
 

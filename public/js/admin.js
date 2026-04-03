@@ -4,6 +4,7 @@ import { PLAYERS, createToken, getPlayerById } from './players.js';
 import { QUESTIONS } from './questions.js';
 import { QuizEngine, getRanking } from './quiz-engine.js';
 import { initDB, dbSet, dbGet, dbListen } from './db.js';
+import { playRoundMusic, fadeOut, stop as stopMusic, setVolume, isPlaying } from './music.js';
 
 const engine = new QuizEngine(QUESTIONS, PLAYERS);
 
@@ -19,9 +20,13 @@ const btnConnectAll = document.getElementById('btn-connect-all');
 const btnRandomVotes = document.getElementById('btn-random-votes');
 const btnReset = document.getElementById('btn-reset');
 const btnJeopardy = document.getElementById('btn-jeopardy');
+const btnMute = document.getElementById('btn-mute');
+const volumeSlider = document.getElementById('volume-slider');
 
 let _restoring = false;
 let _jeopardyAudio = null;
+let _muted = false;
+let _savedVolume = 0.35;
 
 // --- Sync engine → Firebase ---
 
@@ -167,6 +172,14 @@ engine.on('phase-change', (phase) => {
     renderQuestionInfo();
     renderVoteStatus();
     clearVotes();
+  }
+  // Musique d'ambiance automatique
+  if (phase === 'round-intro') {
+    playRoundMusic(engine.currentRoundNumber);
+  } else if (phase === 'reveal' || phase === 'scores' || phase === 'final') {
+    fadeOut();
+  } else if (phase === 'lobby') {
+    stopMusic();
   }
   syncState();
 });
@@ -343,12 +356,35 @@ btnJeopardy.addEventListener('click', () => {
     btnJeopardy.textContent = 'Jeopardy';
     return;
   }
+  stopMusic(); // arrêter la musique d'ambiance
   _jeopardyAudio = new Audio('assets/jeopardy.mp3');
+  _jeopardyAudio.volume = _muted ? 0 : _savedVolume;
   _jeopardyAudio.play();
-  btnJeopardy.textContent = 'Arrêter musique';
+  btnJeopardy.textContent = 'Stop Jeopardy';
   _jeopardyAudio.addEventListener('ended', () => {
     btnJeopardy.textContent = 'Jeopardy';
   });
+});
+
+btnMute.addEventListener('click', () => {
+  _muted = !_muted;
+  if (_muted) {
+    setVolume(0);
+    if (_jeopardyAudio) _jeopardyAudio.volume = 0;
+    btnMute.textContent = 'Unmute';
+  } else {
+    setVolume(_savedVolume);
+    if (_jeopardyAudio) _jeopardyAudio.volume = _savedVolume;
+    btnMute.textContent = 'Mute musique';
+  }
+});
+
+volumeSlider.addEventListener('input', (e) => {
+  _savedVolume = e.target.value / 100;
+  if (!_muted) {
+    setVolume(_savedVolume);
+    if (_jeopardyAudio) _jeopardyAudio.volume = _savedVolume;
+  }
 });
 
 // --- Boot ---
