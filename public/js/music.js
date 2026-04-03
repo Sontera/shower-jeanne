@@ -30,6 +30,23 @@ export function playRoundMusic(roundNumber) {
 }
 
 /**
+ * Joue un fichier audio arbitraire (remplace la musique en cours).
+ * @param {string} src - chemin du fichier
+ * @param {Object} options - { loop: false, onEnded: null }
+ */
+export function playFile(src, options = {}) {
+  stop();
+  _audio = new Audio(src);
+  _audio.loop = !!options.loop;
+  _audio.volume = _volume;
+  if (options.onEnded) {
+    _audio.addEventListener('ended', options.onEnded);
+  }
+  const p = _audio.play();
+  if (p) p.catch(() => {});
+}
+
+/**
  * Joue un son court (reveal, final, etc.)
  * @param {string} name - nom du fichier sans extension (ex: 'reveal', 'final')
  */

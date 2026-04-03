@@ -4,7 +4,7 @@ import { PLAYERS, createToken, getPlayerById } from './players.js';
 import { QUESTIONS } from './questions.js';
 import { QuizEngine, getRanking } from './quiz-engine.js';
 import { initDB, dbSet, dbGet, dbListen } from './db.js';
-import { playRoundMusic, fadeOut, stop as stopMusic, setVolume, isPlaying } from './music.js';
+import { playRoundMusic, playFile, fadeOut, stop as stopMusic, setVolume, getVolume, isPlaying } from './music.js';
 
 const engine = new QuizEngine(QUESTIONS, PLAYERS);
 
@@ -25,7 +25,6 @@ const btnMute = document.getElementById('btn-mute');
 const volumeSlider = document.getElementById('volume-slider');
 
 let _restoring = false;
-let _jeopardyAudio = null;
 let _muted = false;
 let _savedVolume = 0.35;
 
@@ -382,44 +381,24 @@ btnConnectAll.addEventListener('click', connectAllPlayers);
 btnRandomVotes.addEventListener('click', simulateRandomVotes);
 btnReset.addEventListener('click', resetQuiz);
 btnJeopardy.addEventListener('click', () => {
-  // Si déjà en lecture, arrêter
-  if (_jeopardyAudio && !_jeopardyAudio.paused) {
-    _jeopardyAudio.pause();
-    _jeopardyAudio.currentTime = 0;
-    _jeopardyAudio = null;
+  if (isPlaying()) {
+    stopMusic();
     btnJeopardy.textContent = 'Jeopardy';
     return;
   }
-  // Arrêter la musique d'ambiance d'abord
-  stopMusic();
-  // Créer l'audio une seule fois, attendre qu'il soit prêt
-  _jeopardyAudio = new Audio('assets/jeopardy.mp3');
-  _jeopardyAudio.volume = _muted ? 0 : _savedVolume;
-  _jeopardyAudio.addEventListener('ended', () => {
-    btnJeopardy.textContent = 'Jeopardy';
-    _jeopardyAudio = null;
+  playFile('assets/jeopardy.mp3', {
+    onEnded: () => { btnJeopardy.textContent = 'Jeopardy'; }
   });
-  const playPromise = _jeopardyAudio.play();
-  if (playPromise !== undefined) {
-    playPromise.then(() => {
-      btnJeopardy.textContent = 'Stop Jeopardy';
-    }).catch((err) => {
-      console.warn('[admin] Jeopardy play failed:', err.message);
-      btnJeopardy.textContent = 'Jeopardy';
-      _jeopardyAudio = null;
-    });
-  }
+  btnJeopardy.textContent = 'Stop Jeopardy';
 });
 
 btnMute.addEventListener('click', () => {
   _muted = !_muted;
   if (_muted) {
     setVolume(0);
-    if (_jeopardyAudio) _jeopardyAudio.volume = 0;
     btnMute.textContent = 'Unmute';
   } else {
     setVolume(_savedVolume);
-    if (_jeopardyAudio) _jeopardyAudio.volume = _savedVolume;
     btnMute.textContent = 'Mute musique';
   }
 });
@@ -428,7 +407,6 @@ volumeSlider.addEventListener('input', (e) => {
   _savedVolume = e.target.value / 100;
   if (!_muted) {
     setVolume(_savedVolume);
-    if (_jeopardyAudio) _jeopardyAudio.volume = _savedVolume;
   }
 });
 
