@@ -5,8 +5,6 @@ import { QUESTIONS } from './questions.js';
 import { QuizEngine, getRanking } from './quiz-engine.js';
 import { initDB, dbSet, dbGet, dbListen } from './db.js';
 
-// --- Engine (seul l'admin en possède un) ---
-
 const engine = new QuizEngine(QUESTIONS, PLAYERS);
 
 // --- DOM ---
@@ -21,7 +19,6 @@ const btnConnectAll = document.getElementById('btn-connect-all');
 const btnRandomVotes = document.getElementById('btn-random-votes');
 const btnReset = document.getElementById('btn-reset');
 
-// Flag pour éviter les boucles de sync pendant la restauration
 let _restoring = false;
 
 // --- Sync engine → Firebase ---
@@ -64,24 +61,60 @@ function updateControls(phase) {
 
   btnStart.disabled = phase !== 'lobby';
   btnReveal.disabled = phase !== 'question';
-  btnScores.disabled = phase !== 'reveal';
-  btnNext.disabled = phase !== 'scores';
-  btnBack.disabled = phase === 'lobby' || phase === 'final';
   btnRandomVotes.disabled = phase !== 'question';
+
+  // After reveal: "Classement" only at end of round, "Question suivante" mid-round
+  if (phase === 'reveal') {
+    if (engine.isEndOfRound) {
+      btnScores.disabled = false;
+      btnScores.textContent = engine.isLastQuestion ? 'Classement final' : 'Classement';
+      btnNext.disabled = true;
+    } else {
+      btnScores.disabled = true;
+      btnNext.disabled = false;
+      btnNext.textContent = 'Question suivante';
+    }
+  } else if (phase === 'scores') {
+    btnScores.disabled = true;
+    btnNext.disabled = false;
+    btnNext.textContent = engine.isLastQuestion ? 'Podium final' : 'Round suivant';
+  } else if (phase === 'round-intro') {
+    btnScores.disabled = true;
+    btnNext.disabled = false;
+    btnNext.textContent = 'Commencer le round';
+  } else {
+    btnScores.disabled = true;
+    btnNext.disabled = true;
+    btnNext.textContent = 'Question suivante';
+  }
+
+  btnBack.disabled = phase === 'lobby' || phase === 'final';
 
   document.getElementById('panel-config').style.display =
     phase === 'lobby' ? 'block' : 'none';
-  document.getElementById('question-info').style.display =
-    (phase === 'question' || phase === 'reveal') ? 'block' : 'none';
-  document.getElementById('vote-status').style.display =
-    (phase === 'question' || phase === 'reveal') ? 'block' : 'none';
+
+  const showQuestion = phase === 'question' || phase === 'reveal';
+  document.getElementById('question-info').style.display = showQuestion ? 'block' : 'none';
+  document.getElementById('vote-status').style.display = showQuestion ? 'block' : 'none';
+
+  // Masquer la réponse pendant la phase question, montrer seulement en reveal
+  const answerEl = document.getElementById('admin-q-answer');
+  if (answerEl) {
+    answerEl.style.display = phase === 'reveal' ? 'block' : 'none';
+  }
 }
 
 function renderQuestionInfo() {
   const q = engine.currentQuestion;
   if (!q) return;
+
+  // Question X dans le round
+  let qInRound = engine.questionInRound;
+  let roundTotal = engine.questionsInCurrentRound;
+
   document.getElementById('admin-q-text').textContent =
-    `[${q.id}] ${q.text}`;
+    `[R${q.round || '?'} Q${qInRound}/${roundTotal}] ${q.text}`;
+
   const correctChoice = q.choices.find(c => c.startsWith(q.answer + ')')) || q.answer;
   document.getElementById('admin-q-answer').textContent =
     `Bonne réponse : ${correctChoice}`;
@@ -144,6 +177,7 @@ engine.on('vote', () => {
 engine.on('answer-revealed', (_qi, _answer, results) => {
   syncRevealResults(results);
   syncState();
+  updateControls('reveal');
 });
 
 engine.on('scores-update', () => {
@@ -154,7 +188,7 @@ engine.on('player-joined', () => {
   renderPlayerList();
 });
 
-// --- Listen for votes from players (Firebase → engine) ---
+// --- Firebase listeners ---
 
 function listenForVotes() {
   dbListen('votes', (votes) => {
@@ -166,8 +200,6 @@ function listenForVotes() {
     }
   });
 }
-
-// --- Listen for player connections ---
 
 function listenForPlayers() {
   dbListen('players', (players) => {
@@ -182,7 +214,7 @@ function listenForPlayers() {
   });
 }
 
-// --- Connecter tous les joueurs (test) ---
+// --- Test tools ---
 
 async function connectAllPlayers() {
   for (const player of PLAYERS) {
@@ -196,8 +228,6 @@ async function connectAllPlayers() {
   syncState();
 }
 
-// --- Simuler votes aléatoires ---
-
 async function simulateRandomVotes() {
   if (engine.phase !== 'question') return;
   const q = engine.currentQuestion;
@@ -205,21 +235,16 @@ async function simulateRandomVotes() {
 
   const letters = q.choices.map(c => c.charAt(0));
   for (const playerId of engine.connectedPlayers) {
-    if (engine.votes[playerId] != null) continue; // déjà voté
+    if (engine.votes[playerId] != null) continue;
     const randomChoice = letters[Math.floor(Math.random() * letters.length)];
     await dbSet(`votes/${playerId}`, randomChoice);
     engine.castVote(playerId, randomChoice);
   }
 }
 
-// --- Reset quiz avec confirmation ---
-
 async function resetQuiz() {
-  if (!confirm('Recommencer le quiz depuis le début?\n\nTous les scores et le progrès seront perdus.')) {
-    return;
-  }
+  if (!confirm('Recommencer le quiz depuis le début?\n\nTous les scores et le progrès seront perdus.')) return;
 
-  // Recréer un engine frais
   engine.loadState({
     phase: 'lobby',
     currentQuestion: 0,
@@ -250,7 +275,6 @@ async function restoreState() {
   const savedVotes = await dbGet('votes');
 
   if (!savedState || !savedState.phase || savedState.phase === 'lobby') {
-    // Pas de partie en cours, on reste en lobby
     updateControls('lobby');
     renderPlayerList();
     return false;
@@ -258,44 +282,32 @@ async function restoreState() {
 
   _restoring = true;
 
-  // Restaurer les joueurs connectés
-  // Firebase convertit les arrays en objets, il faut reconvertir
   let connectedPlayers = savedState.connectedPlayers || [];
-  if (!Array.isArray(connectedPlayers)) {
-    connectedPlayers = Object.values(connectedPlayers);
-  }
+  if (!Array.isArray(connectedPlayers)) connectedPlayers = Object.values(connectedPlayers);
   for (const playerId of connectedPlayers) {
     if (!engine.connectedPlayers.includes(playerId)) {
       engine.connectPlayer(playerId);
     }
   }
 
-  // Restaurer les scores
   if (savedState.scores) {
     for (const [playerId, score] of Object.entries(savedState.scores)) {
       engine._scores[playerId] = score;
     }
   }
 
-  // Restaurer la position dans le quiz
   engine._currentQuestion = savedState.currentQuestion || 0;
   engine._clearVotes();
 
-  // Restaurer les votes en cours si on est en phase question
   if (savedVotes && savedState.phase === 'question') {
     for (const [playerId, choice] of Object.entries(savedVotes)) {
-      if (choice != null) {
-        engine._votes[playerId] = choice;
-      }
+      if (choice != null) engine._votes[playerId] = choice;
     }
   }
 
-  // Restaurer la phase
   engine._phase = savedState.phase;
-
   _restoring = false;
 
-  // Mettre à jour l'UI
   updateControls(engine.phase);
   renderPlayerList();
   if (engine.phase === 'question' || engine.phase === 'reveal') {
@@ -303,7 +315,6 @@ async function restoreState() {
     renderVoteStatus();
   }
 
-  console.log(`[admin] État restauré: phase=${engine.phase}, question=${engine.currentQuestionIndex + 1}/${engine.totalQuestions}`);
   return true;
 }
 
@@ -312,7 +323,13 @@ async function restoreState() {
 btnStart.addEventListener('click', () => engine.startQuiz());
 btnReveal.addEventListener('click', () => engine.revealAnswer());
 btnScores.addEventListener('click', () => engine.showScores());
-btnNext.addEventListener('click', () => engine.nextQuestion());
+btnNext.addEventListener('click', () => {
+  if (engine.phase === 'round-intro') {
+    engine.startRound();
+  } else {
+    engine.nextQuestion();
+  }
+});
 btnBack.addEventListener('click', () => engine.goBack());
 btnConnectAll.addEventListener('click', connectAllPlayers);
 btnRandomVotes.addEventListener('click', simulateRandomVotes);
@@ -322,12 +339,8 @@ btnReset.addEventListener('click', resetQuiz);
 
 async function boot() {
   await initDB();
-
-  // Tenter de restaurer une partie en cours
   const restored = await restoreState();
-
   if (!restored) {
-    // Première session ou lobby — initialiser proprement
     await dbSet('state', {
       phase: 'lobby',
       currentQuestion: 0,
@@ -336,7 +349,6 @@ async function boot() {
       totalQuestions: engine.totalQuestions,
     });
   }
-
   listenForVotes();
   listenForPlayers();
 }

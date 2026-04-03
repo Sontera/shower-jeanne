@@ -97,7 +97,7 @@ Source : `quiz_shower_bebe.md` (115 questions), filtrées par les résultats du 
 **Q8.** À quelle distance un nouveau-né peut-il voir nettement?
 
 - A) 2 à 5 cm
-- B) 20 à 35 cm (8 à 14 pouces)
+- B) 20 à 35 cm
 - C) 1 à 2 mètres
 - D) Il voit normalement dès la naissance
 
@@ -120,10 +120,10 @@ Source : `quiz_shower_bebe.md` (115 questions), filtrées par les résultats du 
 
 - A) 6 mois
 - B) 1 an
-- C) 2 à 2,5 ans
+- C) 2.5 ans
 - D) 5 ans
 
-> **Réponse : C)** 2 à 2,5 ans. Les capacités cognitives d'un chien moyen (vocabulaire ~165 mots, comptage, conscience émotionnelle) sont comparables à celles d'un enfant de 2 à 2,5 ans. Les chiens « surdoués » comme les Border Collies atteignent le niveau d'un enfant de 3 ans. Donc oui, pendant ses 2 premières années, ton bébé est techniquement moins futé que ton chien.
+> **Réponse : C)** 2.5 ans. Les capacités cognitives d'un chien moyen (vocabulaire ~165 mots, comptage, conscience émotionnelle) sont comparables à celles d'un enfant de 2 à 2.5 ans. Les chiens « surdoués » comme les Border Collies atteignent le niveau d'un enfant de 3 ans. Donc oui, pendant ses 2 premières années, ton bébé est techniquement moins futé que ton chien.
 
 ---
 
@@ -219,14 +219,14 @@ Source : `quiz_shower_bebe.md` (115 questions), filtrées par les résultats du 
 
 ---
 
-**Q19.** Quel animal a la période de « couvaison » la plus longue connue au monde — environ 4,5 ans?
+**Q19.** Quel animal a la période de « couvaison » la plus longue connue au monde — environ 4.5 ans?
 
 - A) L'albatros royal
 - B) Le requin à collerette
 - C) La pieuvre des profondeurs (*Graneledone boreopacifica*)
 - D) La tortue géante des Galápagos
 
-> **Réponse : C)** La pieuvre des profondeurs (*Graneledone boreopacifica*). Une femelle a été observée couvant ses 160 œufs pendant 53 mois (4,5 ans) à 1 400 m de profondeur. Elle n'a pas mangé de tout ce temps et est morte après l'éclosion.
+> **Réponse : C)** La pieuvre des profondeurs (*Graneledone boreopacifica*). Une femelle a été observée couvant ses 160 œufs pendant 53 mois (4.5 ans) à 1 400 m de profondeur. Elle n'a pas mangé de tout ce temps et est morte après l'éclosion.
 
 ---
 
@@ -438,7 +438,7 @@ Source : `quiz_shower_bebe.md` (115 questions), filtrées par les résultats du 
 - C) ~40 %
 - D) ~55 %
 
-> **Réponse : C)** ~40 %. Selon le bilan démographique 2024 de l'ISQ, 40 % des bébés nés au Québec en 2024 avaient au moins un parent né à l'étranger, un phénomène en hausse constante. Par ailleurs, l'indice de fécondité du Québec a atteint un creux historique de 1,33 enfant par femme en 2024, et pour la première fois, les décès (78 800) ont dépassé les naissances (77 400).
+> **Réponse : C)** ~40 %. Selon le bilan démographique 2024 de l'ISQ, 40 % des bébés nés au Québec en 2024 avaient au moins un parent né à l'étranger, un phénomène en hausse constante. Par ailleurs, l'indice de fécondité du Québec a atteint un creux historique de 1.33 enfant par femme en 2024, et pour la première fois, les décès (78 800) ont dépassé les naissances (77 400).
 
 ---
 
@@ -449,7 +449,7 @@ Source : `quiz_shower_bebe.md` (115 questions), filtrées par les résultats du 
 - C) ~11 %
 - D) ~18 %
 
-> **Réponse : C)** ~11 %. Selon l'INSPQ, la prévalence à vie du TDAH diagnostiqué chez les 1-24 ans au Québec s'établissait à 11,3 % en 2015-2016, avec un ratio de deux garçons pour une fille. Le Québec affiche l'un des taux de diagnostic les plus élevés au Canada. Fait intéressant : les enfants nés en septembre (juste avant l'entrée scolaire du 1er octobre) sont significativement plus diagnostiqués que ceux nés en octobre — la « maturité » vs l'immaturité relative dans une classe jouant un rôle.
+> **Réponse : C)** ~11 %. Selon l'INSPQ, la prévalence à vie du TDAH diagnostiqué chez les 1-24 ans au Québec s'établissait à 11.3 % en 2015-2016, avec un ratio de deux garçons pour une fille. Le Québec affiche l'un des taux de diagnostic les plus élevés au Canada. Fait intéressant : les enfants nés en septembre (juste avant l'entrée scolaire du 1er octobre) sont significativement plus diagnostiqués que ceux nés en octobre — la « maturité » vs l'immaturité relative dans une classe jouant un rôle.
 
 ---
 
@@ -460,7 +460,7 @@ Source : `quiz_shower_bebe.md` (115 questions), filtrées par les résultats du 
 - C) Privé : 97 % / Public : 85 %
 - D) Privé : 99 % / Public : 90 %
 
-> **Réponse : B)** Privé : 93 % / Public : 77 %. Le taux de diplomation au secondaire est de 93,1 % dans le réseau privé contre 76,5 % dans le public. Attention au biais de sélection : les écoles privées sélectionnent souvent leurs élèves à l'entrée et desservent des familles en moyenne plus aisées.
+> **Réponse : B)** Privé : 93 % / Public : 77 %. Le taux de diplomation au secondaire est de 93.1 % dans le réseau privé contre 76.5 % dans le public. Attention au biais de sélection : les écoles privées sélectionnent souvent leurs élèves à l'entrée et desservent des familles en moyenne plus aisées.
 
 ---
 
@@ -579,7 +579,7 @@ Source : `quiz_shower_bebe.md` (115 questions), filtrées par les résultats du 
 - C) 3-4 ans
 - D) 5-6 ans
 
-> **Réponse : C)** 3-4 ans. L'amnésie infantile est un phénomène robuste documenté depuis plus d'un siècle : chez les adultes occidentaux, l'âge moyen du premier souvenir autobiographique se situe entre 3 et 3,5 ans.
+> **Réponse : C)** 3-4 ans. L'amnésie infantile est un phénomène robuste documenté depuis plus d'un siècle : chez les adultes occidentaux, l'âge moyen du premier souvenir autobiographique se situe entre 3 et 3.5 ans.
 
 ---
 
@@ -724,7 +724,7 @@ Source : `quiz_shower_bebe.md` (115 questions), filtrées par les résultats du 
 | Q7 | Q35 | 2. Corps | Respirer + avaler |
 | Q8 | Q32 | 2. Corps | Vision 20-35 cm |
 | Q9 | Q34 | 2. Corps | 1M connexions/sec |
-| Q10 | Q83 | 2. Corps | Chien = 2,5 ans |
+| Q10 | Q83 | 2. Corps | Chien = 2.5 ans |
 | Q11 | Q21 | 3. Parentalité | Sieste dehors |
 | Q12 | Q66 | 3. Parentalité | Allemagne prénom |
 | Q13 | Q10 | 3. Parentalité | Boîte Finlande |
@@ -733,7 +733,7 @@ Source : `quiz_shower_bebe.md` (115 questions), filtrées par les résultats du 
 | Q16 | Q38 | 4. Mythes | Saveurs VRAI |
 | Q17 | Q57 | 4. Mythes | Kangourou diapause |
 | Q18 | Q39 | 4. Mythes | Sourire FAUX |
-| Q19 | Q54 | 4. Mythes | Pieuvre 4,5 ans |
+| Q19 | Q54 | 4. Mythes | Pieuvre 4.5 ans |
 | Q20 | Q43 | 4. Mythes | Chansons VRAI |
 | Q21 | Q93 | 5. Science | Incubateur poussins |
 | Q22 | Q94 | 5. Science | Couney Coney Island |

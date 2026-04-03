@@ -1,35 +1,40 @@
-/* common.css — Thème baby shower + composants partagés */
+/* common.css — Thème baby shower joyeux + composants partagés */
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
 
 :root {
-  /* Palette baby shower — pastel adulte */
-  --bg: #faf7f2;
-  --bg-warm: #f5f0e8;
+  /* Palette joyeuse — pastels vifs */
+  --bg: #fff6f0;
+  --bg-warm: #ffe8da;
   --surface: #ffffff;
-  --text: #2d2a26;
-  --text-muted: #7a756d;
-  --border: #e8e3db;
+  --text: #3a2e28;
+  --text-muted: #9a887c;
+  --border: #f0ddd0;
 
-  --accent: #c4917b;
-  --accent-light: #f0ddd5;
-  --accent-dark: #a06b55;
+  --accent: #e86c4a;
+  --accent-light: #fde0d4;
+  --accent-dark: #c04e2e;
 
-  --correct: #6aab7b;
-  --correct-light: #d8f0dd;
-  --correct-glow: rgba(106, 171, 123, 0.5);
+  --correct: #3dba5e;
+  --correct-light: #c8f5d2;
+  --correct-glow: rgba(61, 186, 94, 0.45);
 
-  --wrong: #c47070;
-  --wrong-light: #f0d8d8;
-  --wrong-glow: rgba(196, 112, 112, 0.5);
+  --wrong: #e04848;
+  --wrong-light: #fdd0d0;
+  --wrong-glow: rgba(224, 72, 72, 0.45);
+
+  --gold: #f0b230;
+  --silver: #b0b8c4;
+  --bronze: #d4944e;
 
   /* Typographie */
-  --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  --font-round: 'Nunito', var(--font);
+  --font: 'Nunito', 'Segoe UI', system-ui, sans-serif;
 
   /* Tokens */
   --token-avatar-size: 56px;
   --token-height: 56px;
   --token-radius: 30px;
-  --token-font-size: 1.1rem;
+  --token-font-size: 1.15rem;
 }
 
 /* Reset */
@@ -46,8 +51,6 @@ body {
 
 /* ============================================================
    JETONS JOUEURS
-   Structure: .player-token > .token-name + .token-avatar > img
-   Le nom est à gauche, l'icone circulaire est à droite.
    ============================================================ */
 
 .player-token {
@@ -55,18 +58,18 @@ body {
   align-items: center;
   height: var(--token-height);
   background: var(--surface);
-  border: 2px solid var(--player-color, var(--border));
+  border: 3px solid var(--player-color, var(--border));
   border-radius: var(--token-radius);
   padding-left: 16px;
-  padding-right: 3px; /* petit espace avant l'avatar */
+  padding-right: 3px;
   gap: 10px;
-  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+  transition: transform 0.35s, box-shadow 0.35s, border-color 0.35s, background 0.35s;
   cursor: default;
   user-select: none;
 }
 
 .token-name {
-  font-weight: 600;
+  font-weight: 700;
   font-size: var(--token-font-size);
   color: var(--text);
   white-space: nowrap;
@@ -81,7 +84,7 @@ body {
   flex-shrink: 0;
   border: 3px solid var(--player-color, var(--border));
   background: var(--player-color, var(--bg-warm));
-  transition: border-color 0.3s, box-shadow 0.4s;
+  transition: border-color 0.35s, box-shadow 0.4s;
 }
 
 .token-avatar img {
@@ -91,14 +94,15 @@ body {
   display: block;
 }
 
-/* --- Taille TV (visible de loin) --- */
+/* --- Taille TV (1.5x, visible de loin) --- */
 .player-token--tv {
-  --token-avatar-size: 64px;
-  --token-height: 64px;
-  --token-radius: 34px;
-  --token-font-size: 1.25rem;
-  padding-left: 20px;
-  gap: 12px;
+  --token-avatar-size: 88px;
+  --token-height: 88px;
+  --token-radius: 46px;
+  --token-font-size: 1.55rem;
+  padding-left: 22px;
+  gap: 14px;
+  border-width: 3px;
 }
 
 /* --- Taille admin --- */
@@ -106,7 +110,7 @@ body {
   --token-avatar-size: 44px;
   --token-height: 44px;
   --token-radius: 24px;
-  --token-font-size: 0.95rem;
+  --token-font-size: 1rem;
   padding-left: 12px;
   gap: 8px;
 }
@@ -116,7 +120,7 @@ body {
   --token-avatar-size: 40px;
   --token-height: 40px;
   --token-radius: 22px;
-  --token-font-size: 0.9rem;
+  --token-font-size: 0.95rem;
   padding-left: 12px;
   gap: 8px;
 }
@@ -125,7 +129,6 @@ body {
    ÉTATS DES JETONS (mood)
    ============================================================ */
 
-/* Neutre — état par défaut */
 .player-token[data-mood="neutral"] {
   border-color: var(--player-color, var(--border));
 }
@@ -133,36 +136,46 @@ body {
 /* Heureux — bonne réponse */
 .player-token[data-mood="happy"] {
   border-color: var(--correct);
-  box-shadow: 0 0 16px var(--correct-glow);
+  background: var(--correct-light);
+  box-shadow: 0 0 20px var(--correct-glow);
   animation: token-bounce 0.5s ease;
 }
 
 .player-token[data-mood="happy"] .token-avatar {
   border-color: var(--correct);
-  box-shadow: 0 0 12px var(--correct-glow);
+  box-shadow: 0 0 14px var(--correct-glow);
+}
+
+.player-token[data-mood="happy"] .token-name {
+  color: #1a7a32;
 }
 
 /* Triste — mauvaise réponse */
 .player-token[data-mood="sad"] {
   border-color: var(--wrong);
-  box-shadow: 0 0 16px var(--wrong-glow);
+  background: var(--wrong-light);
+  box-shadow: 0 0 20px var(--wrong-glow);
   animation: token-shake 0.5s ease;
 }
 
 .player-token[data-mood="sad"] .token-avatar {
   border-color: var(--wrong);
-  box-shadow: 0 0 12px var(--wrong-glow);
+  box-shadow: 0 0 14px var(--wrong-glow);
 }
 
-/* A voté (en attente de révélation) */
+.player-token[data-mood="sad"] .token-name {
+  color: #a02020;
+}
+
+/* A voté (attente de révélation) */
 .player-token[data-voted="true"]::after {
   content: '';
   display: block;
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: var(--accent);
-  margin-right: 6px;
+  margin-right: 8px;
   flex-shrink: 0;
   animation: pulse-dot 1.5s ease infinite;
 }
@@ -204,41 +217,35 @@ body {
   to   { opacity: 1; transform: translateX(0); }
 }
 
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
 /* ============================================================
    UTILITAIRES
    ============================================================ */
 
-.fade-in {
-  animation: fade-in 0.4s ease both;
-}
-
-.slide-in-left {
-  animation: slide-in-left 0.4s ease both;
-}
+.fade-in { animation: fade-in 0.4s ease both; }
+.slide-in-left { animation: slide-in-left 0.4s ease both; }
+.scale-in { animation: scale-in 0.5s ease both; }
 
 .visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;
 }
 
-/* Badge de score à côté du jeton */
 .token-score {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 28px;
-  height: 28px;
-  border-radius: 14px;
+  min-width: 32px;
+  height: 32px;
+  border-radius: 16px;
   background: var(--accent-light);
   color: var(--accent-dark);
-  font-weight: 700;
-  font-size: 0.9rem;
-  padding: 0 8px;
+  font-weight: 800;
+  font-size: 1rem;
+  padding: 0 10px;
   margin-left: 8px;
 }

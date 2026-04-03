@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=1920">
   <title>Quiz Shower de Bébé — TV</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="css/common.css">
   <link rel="stylesheet" href="css/tv.css">
 </head>
@@ -16,6 +18,15 @@
       <p class="lobby-subtitle">Scannez le QR code pour rejoindre!</p>
       <div class="lobby-qr" id="qr-code">QR code</div>
       <div class="lobby-players" id="lobby-players"></div>
+    </div>
+
+    <!-- ROUND INTRO -->
+    <div id="screen-round-intro" class="round-intro-screen">
+      <div class="round-intro-content">
+        <p class="round-label" id="round-label">Round 1</p>
+        <h2 class="round-theme" id="round-theme"></h2>
+        <p class="round-subtitle" id="round-subtitle">5 questions</p>
+      </div>
     </div>
 
     <!-- QUESTION -->
@@ -34,7 +45,7 @@
 
     <!-- SCORES -->
     <div id="screen-scores" class="scores-screen">
-      <h2>Classement</h2>
+      <h2 id="scores-title">Classement</h2>
       <div class="scoreboard" id="scoreboard"></div>
     </div>
 

@@ -1,31 +1,19 @@
 // quiz-engine.js — Machine à états du quiz
+//
+// Phases: lobby → round-intro → question → reveal → [question → reveal ...] → scores → round-intro → ... → final
 
-const PHASES = ['lobby', 'question', 'reveal', 'scores', 'final'];
-
-/**
- * QuizEngine gère l'état complet du quiz.
- * Fonctionne en local (in-memory). La couche db.js synchronise avec Firebase.
- *
- * Usage:
- *   const engine = new QuizEngine(questions, players);
- *   engine.on('phase-change', (phase) => { ... });
- *   engine.on('vote', (playerId, choice) => { ... });
- *   engine.on('scores-update', (scores) => { ... });
- */
 export class QuizEngine {
   constructor(questions = [], players = []) {
     this._listeners = {};
     this._questions = questions;
     this._players = players;
 
-    // State
     this._phase = 'lobby';
     this._currentQuestion = 0;
-    this._votes = {};       // { playerId: 'A'|'B'|'C'|'D' }
-    this._scores = {};      // { playerId: number }
+    this._votes = {};
+    this._scores = {};
     this._connectedPlayers = new Set();
 
-    // Initialiser les scores à 0
     for (const p of players) {
       this._scores[p.id] = 0;
     }
@@ -36,11 +24,7 @@ export class QuizEngine {
   get phase() { return this._phase; }
   get currentQuestionIndex() { return this._currentQuestion; }
   get totalQuestions() { return this._questions.length; }
-
-  get currentQuestion() {
-    return this._questions[this._currentQuestion] || null;
-  }
-
+  get currentQuestion() { return this._questions[this._currentQuestion] || null; }
   get votes() { return { ...this._votes }; }
   get scores() { return { ...this._scores }; }
   get connectedPlayers() { return [...this._connectedPlayers]; }
@@ -49,26 +33,60 @@ export class QuizEngine {
     return this._currentQuestion >= this._questions.length - 1;
   }
 
-  /**
-   * Nombre de joueurs ayant voté pour la question en cours.
-   */
   get voteCount() {
     return Object.values(this._votes).filter(v => v !== null).length;
   }
 
-  /**
-   * Tous les joueurs connectés ont voté ?
-   */
   get allVotesIn() {
     return this._connectedPlayers.size > 0 &&
       [...this._connectedPlayers].every(id => this._votes[id] != null);
   }
 
-  // --- Actions (appelées par l'admin) ---
+  /** Vrai si la question courante est la dernière de son round. */
+  get isEndOfRound() {
+    if (this.isLastQuestion) return true;
+    const current = this._questions[this._currentQuestion];
+    const next = this._questions[this._currentQuestion + 1];
+    if (!current || !next) return true;
+    if (current.round != null && next.round != null) {
+      return current.round !== next.round;
+    }
+    return (this._currentQuestion + 1) % 5 === 0;
+  }
 
-  /**
-   * Un joueur rejoint la partie.
-   */
+  /** Numéro du round courant. */
+  get currentRoundNumber() {
+    const q = this._questions[this._currentQuestion];
+    return q ? (q.round || 1) : 1;
+  }
+
+  /** Thème du round courant. */
+  get currentRoundTheme() {
+    const q = this._questions[this._currentQuestion];
+    return q ? (q.theme || '') : '';
+  }
+
+  /** Index de la question dans son round (1-based). */
+  get questionInRound() {
+    const q = this._questions[this._currentQuestion];
+    if (!q) return 1;
+    let count = 1;
+    for (let i = this._currentQuestion - 1; i >= 0; i--) {
+      if (this._questions[i].round === q.round) count++;
+      else break;
+    }
+    return count;
+  }
+
+  /** Nombre de questions dans le round courant. */
+  get questionsInCurrentRound() {
+    const q = this._questions[this._currentQuestion];
+    if (!q) return 5;
+    return this._questions.filter(qq => qq.round === q.round).length;
+  }
+
+  // --- Actions ---
+
   connectPlayer(playerId) {
     this._connectedPlayers.add(playerId);
     if (!(playerId in this._scores)) {
@@ -78,24 +96,25 @@ export class QuizEngine {
     this._emit('scores-update', this.scores);
   }
 
-  /**
-   * Lancer le quiz depuis le lobby.
-   */
+  /** Lobby → round-intro */
   startQuiz() {
     if (this._phase !== 'lobby') return;
     if (this._questions.length === 0) return;
     this._currentQuestion = 0;
     this._clearVotes();
+    this._setPhase('round-intro');
+  }
+
+  /** Round-intro → question */
+  startRound() {
+    if (this._phase !== 'round-intro') return;
+    this._clearVotes();
     this._setPhase('question');
   }
 
-  /**
-   * Un joueur soumet son vote.
-   */
   castVote(playerId, choice) {
     if (this._phase !== 'question') return;
     if (!this._connectedPlayers.has(playerId)) return;
-    // Un seul vote par question
     if (this._votes[playerId] != null) return;
 
     this._votes[playerId] = choice;
@@ -106,15 +125,12 @@ export class QuizEngine {
     }
   }
 
-  /**
-   * Révéler la bonne réponse (animateur clique "Révéler").
-   */
+  /** Question → reveal */
   revealAnswer() {
     if (this._phase !== 'question') return;
     const q = this.currentQuestion;
     if (!q) return;
 
-    // Calculer les points
     const results = {};
     for (const playerId of this._connectedPlayers) {
       const vote = this._votes[playerId];
@@ -130,39 +146,36 @@ export class QuizEngine {
     this._emit('scores-update', this.scores);
   }
 
-  /**
-   * Afficher le classement.
-   */
+  /** Reveal → scores (fin de round uniquement) */
   showScores() {
     if (this._phase !== 'reveal') return;
     this._setPhase('scores');
   }
 
-  /**
-   * Passer à la question suivante.
-   */
+  /** Reveal → question suivante (mid-round) */
   nextQuestion() {
-    if (this._phase !== 'scores') return;
-
-    if (this.isLastQuestion) {
-      this._setPhase('final');
+    if (this._phase === 'reveal' && !this.isEndOfRound) {
+      this._currentQuestion++;
+      this._clearVotes();
+      this._setPhase('question');
       return;
     }
-
-    this._currentQuestion++;
-    this._clearVotes();
-    this._setPhase('question');
+    // Après scores: round suivant ou final
+    if (this._phase === 'scores') {
+      if (this.isLastQuestion) {
+        this._setPhase('final');
+      } else {
+        this._currentQuestion++;
+        this._clearVotes();
+        this._setPhase('round-intro');
+      }
+      return;
+    }
   }
 
-  /**
-   * Revenir en arrière (undo).
-   */
   goBack() {
     switch (this._phase) {
       case 'reveal':
-        // Annuler la révélation — on devrait retirer les points attribués
-        // Pour simplifier, on recalcule tout
-        this._recalculateScores();
         this._setPhase('question');
         break;
       case 'scores':
@@ -172,15 +185,19 @@ export class QuizEngine {
         if (this._currentQuestion > 0) {
           this._currentQuestion--;
           this._clearVotes();
+          this._setPhase('reveal');
+        }
+        break;
+      case 'round-intro':
+        if (this._currentQuestion === 0) {
+          this._setPhase('lobby');
+        } else {
           this._setPhase('scores');
         }
         break;
     }
   }
 
-  /**
-   * Charger un état complet (pour restauration ou sync Firebase).
-   */
   loadState(state) {
     this._phase = state.phase || 'lobby';
     this._currentQuestion = state.currentQuestion || 0;
@@ -192,9 +209,6 @@ export class QuizEngine {
     this._emit('scores-update', this.scores);
   }
 
-  /**
-   * Exporter l'état complet.
-   */
   getState() {
     return {
       phase: this._phase,
@@ -224,8 +238,6 @@ export class QuizEngine {
     }
   }
 
-  // --- Internal ---
-
   _setPhase(phase) {
     this._phase = phase;
     this._emit('phase-change', phase);
@@ -237,28 +249,8 @@ export class QuizEngine {
       this._votes[id] = null;
     }
   }
-
-  /**
-   * Recalcule tous les scores depuis le début jusqu'à la question courante (excluant).
-   * Utilisé pour le undo.
-   */
-  _recalculateScores() {
-    const scores = {};
-    for (const id of this._connectedPlayers) {
-      scores[id] = 0;
-    }
-    // Note: on n'a pas l'historique des votes passés en mémoire pour l'instant.
-    // Pour un vrai undo, il faudrait stocker l'historique.
-    // Pour l'instant, on ne touche pas aux scores lors du goBack depuis reveal.
-    // TODO: stocker l'historique des votes pour un undo propre
-  }
 }
 
-/**
- * Retourne le classement trié (du meilleur au moins bon).
- * @param {Object} scores - { playerId: number }
- * @returns {Array<{playerId, score, rank}>}
- */
 export function getRanking(scores) {
   const sorted = Object.entries(scores)
     .map(([playerId, score]) => ({ playerId, score }))

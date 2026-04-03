@@ -9,6 +9,7 @@ import { initDB, dbListen } from './db.js';
 
 const screens = {
   lobby: document.getElementById('screen-lobby'),
+  'round-intro': document.getElementById('screen-round-intro'),
   question: document.getElementById('screen-question'),
   scores: document.getElementById('screen-scores'),
   final: document.getElementById('screen-final'),
@@ -25,7 +26,6 @@ function showScreen(phase) {
 
 let currentState = null;
 let currentVotes = {};
-let revealResults = null;
 
 // --- Lobby ---
 
@@ -36,9 +36,21 @@ function renderLobby(connectedPlayers) {
     const isConnected = connectedPlayers && connectedPlayers.includes(player.id);
     const token = createToken(player, 'neutral', { size: 'tv' });
     token.style.animationDelay = `${PLAYERS.indexOf(player) * 0.1}s`;
-    if (!isConnected) token.style.opacity = '0.35';
+    if (!isConnected) token.style.opacity = '0.3';
     container.appendChild(token);
   }
+}
+
+// --- Round intro ---
+
+function renderRoundIntro(questionIndex) {
+  const q = QUESTIONS[questionIndex];
+  if (!q) return;
+  document.getElementById('round-label').textContent = `Round ${q.round || '?'}`;
+  document.getElementById('round-theme').textContent = q.theme || '';
+  // Count questions in this round
+  const count = QUESTIONS.filter(qq => qq.round === q.round).length;
+  document.getElementById('round-subtitle').textContent = `${count} questions`;
 }
 
 // --- Question ---
@@ -49,8 +61,12 @@ function renderPlayersColumn(connectedPlayers) {
   const col = document.getElementById('players-column');
   col.innerHTML = '';
   playerTokens = {};
+  // Normalize connectedPlayers (Firebase may return object instead of array)
+  let players = connectedPlayers || [];
+  if (!Array.isArray(players)) players = Object.values(players);
+
   for (const player of PLAYERS) {
-    if (!connectedPlayers || !connectedPlayers.includes(player.id)) continue;
+    if (!players.includes(player.id)) continue;
     const token = createToken(player, 'neutral', { size: 'tv' });
     playerTokens[player.id] = token;
     col.appendChild(token);
@@ -61,8 +77,16 @@ function renderQuestion(questionIndex, totalQuestions) {
   const q = QUESTIONS[questionIndex];
   if (!q) return;
 
+  // Question X in round
+  let qInRound = 1;
+  for (let i = questionIndex - 1; i >= 0; i--) {
+    if (QUESTIONS[i].round === q.round) qInRound++;
+    else break;
+  }
+  const roundTotal = QUESTIONS.filter(qq => qq.round === q.round).length;
+
   document.getElementById('q-number').textContent =
-    `Question ${questionIndex + 1}/${totalQuestions}`;
+    `Question ${qInRound}/${roundTotal}`;
   document.getElementById('q-theme').textContent = q.theme;
   document.getElementById('q-text').textContent = q.text;
 
@@ -79,7 +103,6 @@ function renderQuestion(questionIndex, totalQuestions) {
   document.getElementById('q-explanation').classList.remove('visible');
   document.getElementById('q-explanation').textContent = '';
 
-  // Reset token moods
   for (const [id, tokenEl] of Object.entries(playerTokens)) {
     const player = getPlayerById(id);
     if (player) updateTokenMood(tokenEl, player, 'neutral');
@@ -103,7 +126,6 @@ function renderReveal(questionIndex, results) {
   const q = QUESTIONS[questionIndex];
   if (!q) return;
 
-  // Highlight correct answer
   const choicesEl = document.getElementById('q-choices');
   for (const div of choicesEl.children) {
     if (div.dataset.letter === q.answer) {
@@ -111,14 +133,12 @@ function renderReveal(questionIndex, results) {
     }
   }
 
-  // Show explanation
   if (q.explanation) {
     const explEl = document.getElementById('q-explanation');
     explEl.textContent = q.explanation;
     explEl.classList.add('visible');
   }
 
-  // Animate tokens
   if (results) {
     for (const [playerId, result] of Object.entries(results)) {
       const tokenEl = playerTokens[playerId];
@@ -131,12 +151,16 @@ function renderReveal(questionIndex, results) {
 
 // --- Scores ---
 
-function renderScores(scores, targetEl) {
+function renderScores(scores, targetEl, roundLabel) {
   const ranking = getRanking(scores || {});
   const maxScore = Math.max(1, ...ranking.map(r => r.score));
 
   targetEl = targetEl || document.getElementById('scoreboard');
   targetEl.innerHTML = '';
+
+  if (roundLabel) {
+    document.getElementById('scores-title').textContent = roundLabel;
+  }
 
   for (const { playerId, score, rank } of ranking) {
     const player = getPlayerById(playerId);
@@ -172,7 +196,7 @@ function renderFinal(scores) {
   const podium = document.getElementById('podium');
   podium.innerHTML = '';
 
-  const order = [1, 0, 2]; // 2nd, 1st, 3rd
+  const order = [1, 0, 2];
   const placeClasses = ['podium-2nd', 'podium-1st', 'podium-3rd'];
 
   for (let i = 0; i < 3; i++) {
@@ -195,7 +219,7 @@ function renderFinal(scores) {
     podium.appendChild(place);
   }
 
-  renderScores(scores, document.getElementById('final-scoreboard'));
+  renderScores(scores, document.getElementById('final-scoreboard'), 'Classement final');
 }
 
 // --- Main state listener ---
@@ -215,24 +239,29 @@ function onStateChange(state) {
       renderLobby(connectedPlayers);
       break;
 
+    case 'round-intro':
+      renderRoundIntro(currentQuestion);
+      renderPlayersColumn(connectedPlayers);
+      break;
+
     case 'question':
       if (lastPhase !== 'question' || lastQuestionIndex !== currentQuestion) {
         renderPlayersColumn(connectedPlayers);
         renderQuestion(currentQuestion, totalQuestions);
       }
       updateVoteIndicators(currentVotes);
-      revealResults = null;
       break;
 
     case 'reveal':
-      if (lastPhase === 'question') {
-        // On vient de passer en reveal — l'animation sera déclenchée par revealResults
-      }
+      // Reveal animation triggered by revealResults listener
       break;
 
-    case 'scores':
-      renderScores(scores);
+    case 'scores': {
+      const q = QUESTIONS[currentQuestion];
+      const label = q ? `Classement — Round ${q.round}` : 'Classement';
+      renderScores(scores, null, label);
       break;
+    }
 
     case 'final':
       renderFinal(scores);
@@ -248,10 +277,8 @@ function onStateChange(state) {
 async function boot() {
   await initDB();
 
-  // Écouter l'état du quiz
   dbListen('state', onStateChange);
 
-  // Écouter les votes (pour les indicateurs visuels)
   dbListen('votes', (votes) => {
     currentVotes = votes || {};
     if (currentState && currentState.phase === 'question') {
@@ -259,14 +286,12 @@ async function boot() {
     }
   });
 
-  // Écouter les résultats de révélation
   dbListen('state/revealResults', (results) => {
     if (results && currentState) {
       renderReveal(currentState.currentQuestion, results);
     }
   });
 
-  // Afficher le lobby par défaut
   showScreen('lobby');
   renderLobby([]);
 }

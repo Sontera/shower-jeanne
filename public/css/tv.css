@@ -5,7 +5,6 @@ body {
   background: var(--bg);
 }
 
-/* Layout principal */
 .tv-container {
   width: 100vw;
   height: 100vh;
@@ -18,7 +17,7 @@ body {
    ============================================================ */
 
 .lobby {
-  display: flex;
+  display: none;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -26,16 +25,17 @@ body {
   gap: 40px;
   padding: 40px;
 }
+.lobby.active { display: flex; }
 
 .lobby h1 {
-  font-size: 3rem;
-  font-weight: 700;
+  font-size: 3.2rem;
+  font-weight: 800;
   color: var(--accent-dark);
   text-align: center;
 }
 
 .lobby-subtitle {
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   color: var(--text-muted);
 }
 
@@ -57,11 +57,51 @@ body {
   flex-wrap: wrap;
   gap: 16px;
   justify-content: center;
-  max-width: 900px;
+  max-width: 1100px;
 }
 
 .lobby-players .player-token {
   animation: fade-in 0.5s ease both;
+}
+
+/* ============================================================
+   ROUND INTRO
+   ============================================================ */
+
+.round-intro-screen {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+  background: linear-gradient(135deg, var(--bg) 0%, var(--bg-warm) 100%);
+}
+.round-intro-screen.active { display: flex; }
+
+.round-intro-content {
+  animation: scale-in 0.6s ease;
+}
+
+.round-label {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 16px;
+}
+
+.round-theme {
+  font-size: 3.2rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.2;
+  margin-bottom: 20px;
+}
+
+.round-subtitle {
+  font-size: 1.3rem;
+  color: var(--text-muted);
 }
 
 /* ============================================================
@@ -72,25 +112,26 @@ body {
   display: none;
   height: 100vh;
 }
-
 .question-screen.active {
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: 380px 1fr;
 }
 
 /* Colonne gauche : joueurs */
 .players-column {
   background: var(--bg-warm);
-  border-right: 2px solid var(--border);
-  padding: 24px 16px;
+  border-right: 3px solid var(--border);
+  padding: 28px 20px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   overflow-y: auto;
+  align-items: stretch;
 }
 
 .players-column .player-token {
   width: 100%;
+  justify-content: space-between;
 }
 
 /* Colonne droite : question */
@@ -98,7 +139,7 @@ body {
   padding: 48px 60px;
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 28px;
   overflow-y: auto;
 }
 
@@ -109,21 +150,21 @@ body {
 }
 
 .question-number {
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: 1.2rem;
+  font-weight: 800;
   color: var(--accent);
   white-space: nowrap;
 }
 
 .question-theme {
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   color: var(--text-muted);
   font-style: italic;
 }
 
 .question-text {
-  font-size: 2rem;
-  font-weight: 600;
+  font-size: 2.1rem;
+  font-weight: 700;
   line-height: 1.35;
   color: var(--text);
 }
@@ -138,49 +179,46 @@ body {
 
 .choice {
   background: var(--surface);
-  border: 2px solid var(--border);
+  border: 3px solid var(--border);
   border-radius: 16px;
   padding: 20px 24px;
-  font-size: 1.3rem;
+  font-size: 1.35rem;
+  font-weight: 600;
   line-height: 1.4;
   transition: border-color 0.3s, background 0.3s, transform 0.2s;
 }
 
-/* Reveal : bonne réponse */
 .choice.correct {
   border-color: var(--correct);
   background: var(--correct-light);
+  font-weight: 700;
 }
 
-/* Reveal : mauvaise réponse sélectionnée */
 .choice.wrong {
   border-color: var(--wrong);
   background: var(--wrong-light);
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 /* ============================================================
-   PHASE REVEAL — Explication
+   REVEAL — Explication
    ============================================================ */
 
 .explanation {
   display: none;
   background: var(--accent-light);
-  border-left: 4px solid var(--accent);
-  border-radius: 0 12px 12px 0;
-  padding: 20px 24px;
-  font-size: 1.15rem;
+  border-left: 5px solid var(--accent);
+  border-radius: 0 14px 14px 0;
+  padding: 22px 26px;
+  font-size: 1.2rem;
   line-height: 1.6;
   color: var(--text);
   animation: fade-in 0.5s ease;
 }
-
-.explanation.visible {
-  display: block;
-}
+.explanation.visible { display: block; }
 
 /* ============================================================
-   PHASE SCORES — Classement
+   SCORES
    ============================================================ */
 
 .scores-screen {
@@ -189,25 +227,23 @@ body {
   align-items: center;
   justify-content: center;
   height: 100vh;
-  gap: 32px;
+  gap: 36px;
   padding: 48px;
 }
-
-.scores-screen.active {
-  display: flex;
-}
+.scores-screen.active { display: flex; }
 
 .scores-screen h2 {
-  font-size: 2.2rem;
+  font-size: 2.6rem;
+  font-weight: 800;
   color: var(--accent-dark);
 }
 
 .scoreboard {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   width: 100%;
-  max-width: 700px;
+  max-width: 750px;
 }
 
 .score-row {
@@ -218,38 +254,37 @@ body {
 }
 
 .score-rank {
-  font-size: 1.4rem;
-  font-weight: 700;
+  font-size: 1.5rem;
+  font-weight: 800;
   color: var(--accent);
-  min-width: 40px;
+  min-width: 44px;
   text-align: center;
 }
 
 .score-bar {
   flex: 1;
-  height: 12px;
+  height: 14px;
   background: var(--border);
-  border-radius: 6px;
+  border-radius: 7px;
   overflow: hidden;
 }
 
 .score-bar-fill {
   height: 100%;
-  border-radius: 6px;
-  background: var(--accent);
+  border-radius: 7px;
   transition: width 0.8s ease;
 }
 
 .score-value {
-  font-size: 1.2rem;
-  font-weight: 700;
+  font-size: 1.3rem;
+  font-weight: 800;
   color: var(--text);
-  min-width: 40px;
+  min-width: 44px;
   text-align: right;
 }
 
 /* ============================================================
-   PHASE FINALE — Podium
+   FINAL — Podium
    ============================================================ */
 
 .final-screen {
@@ -261,13 +296,11 @@ body {
   gap: 40px;
   padding: 48px;
 }
-
-.final-screen.active {
-  display: flex;
-}
+.final-screen.active { display: flex; }
 
 .final-screen h2 {
-  font-size: 2.5rem;
+  font-size: 2.8rem;
+  font-weight: 800;
   color: var(--accent-dark);
 }
 
@@ -286,34 +319,27 @@ body {
 }
 
 .podium-block {
-  width: 160px;
+  width: 170px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px 12px 0 0;
-  font-size: 2rem;
-  font-weight: 700;
+  border-radius: 14px 14px 0 0;
+  font-size: 2.2rem;
+  font-weight: 800;
   color: white;
 }
 
 .podium-1st .podium-block {
   height: 180px;
-  background: linear-gradient(135deg, #e8c84a, #d4a832);
+  background: linear-gradient(135deg, var(--gold), #d4960e);
 }
 
 .podium-2nd .podium-block {
   height: 130px;
-  background: linear-gradient(135deg, #b8bcc4, #9ea3ad);
+  background: linear-gradient(135deg, var(--silver), #8e96a4);
 }
 
 .podium-3rd .podium-block {
   height: 90px;
-  background: linear-gradient(135deg, #d4a06a, #b8844e);
+  background: linear-gradient(135deg, var(--bronze), #b07838);
 }
-
-/* ============================================================
-   Écrans cachés par défaut, affichés via .active
-   ============================================================ */
-
-.lobby.active { display: flex; }
-.lobby { display: none; }

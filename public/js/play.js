@@ -5,8 +5,6 @@ import { QUESTIONS } from './questions.js';
 import { getRanking } from './quiz-engine.js';
 import { initDB, dbSet, dbListen } from './db.js';
 
-// --- State ---
-
 let myPlayerId = null;
 let currentState = null;
 
@@ -52,10 +50,8 @@ async function joinAs(playerId) {
   const player = getPlayerById(playerId);
   document.getElementById('my-name').textContent = player.name;
 
-  // Écrire dans Firebase que ce joueur est connecté
   await dbSet(`players/${playerId}`, true);
 
-  // Afficher l'écran approprié selon la phase actuelle
   if (currentState) {
     onStateChange(currentState);
   } else {
@@ -80,7 +76,6 @@ function renderVoteScreen(questionIndex) {
     btn.textContent = choice;
     const letter = choice.charAt(0);
     btn.addEventListener('click', async () => {
-      // Écrire le vote dans Firebase
       await dbSet(`votes/${myPlayerId}`, letter);
       showPlayScreen('screen-voted');
     });
@@ -107,10 +102,22 @@ function renderResult(questionIndex, results, scores) {
   const myScore = (scores && scores[myPlayerId]) || 0;
   document.getElementById('result-score').textContent = `${myScore} pts`;
 
+  // Classement clair et intuitif
   const ranking = getRanking(scores || {});
   const myRank = ranking.find(r => r.playerId === myPlayerId);
-  document.getElementById('result-rank').textContent =
-    myRank ? `${myRank.rank}e / ${ranking.length}` : '';
+  const rankEl = document.getElementById('result-rank');
+  if (myRank) {
+    const total = ranking.length;
+    if (myRank.rank === 1) {
+      rankEl.textContent = `1re place — tu mènes!`;
+    } else if (myRank.rank === 2) {
+      rankEl.textContent = `2e place sur ${total} joueurs`;
+    } else if (myRank.rank === 3) {
+      rankEl.textContent = `3e place sur ${total} joueurs`;
+    } else {
+      rankEl.textContent = `${myRank.rank}e place sur ${total} joueurs`;
+    }
+  }
 
   updateMyScore(scores);
 }
@@ -140,6 +147,8 @@ function onStateChange(state) {
 
   switch (phase) {
     case 'lobby':
+    case 'round-intro':
+    case 'scores':
       showPlayScreen('screen-waiting');
       break;
 
@@ -151,21 +160,12 @@ function onStateChange(state) {
       break;
 
     case 'reveal':
-      // Result will be rendered by revealResults listener
-      if (lastPhase === 'question') {
-        // Stay on voted/vote screen until results arrive
-      }
-      break;
-
-    case 'scores':
-      updateMyScore(scores);
-      showPlayScreen('screen-waiting');
+      // Result rendered by revealResults listener
       break;
 
     case 'final':
       updateMyScore(scores);
       showPlayScreen('screen-result');
-      // Show final ranking
       const ranking = getRanking(scores || {});
       const myRank = ranking.find(r => r.playerId === myPlayerId);
       document.getElementById('result-icon').className = 'result-icon correct';
@@ -173,8 +173,15 @@ function onStateChange(state) {
       document.getElementById('result-answer').textContent = 'Quiz terminé!';
       document.getElementById('result-score').textContent =
         `${(scores && scores[myPlayerId]) || 0} pts`;
-      document.getElementById('result-rank').textContent =
-        myRank ? `Classement final : ${myRank.rank}e / ${ranking.length}` : '';
+      if (myRank) {
+        const total = ranking.length;
+        if (myRank.rank === 1) {
+          document.getElementById('result-rank').textContent = `1re place — Bravo!`;
+        } else {
+          document.getElementById('result-rank').textContent =
+            `${myRank.rank}e place sur ${total} joueurs`;
+        }
+      }
       break;
   }
 
@@ -190,10 +197,8 @@ async function boot() {
   renderJoinScreen();
   showPlayScreen('screen-join');
 
-  // Écouter l'état du quiz
   dbListen('state', onStateChange);
 
-  // Écouter les résultats de révélation
   dbListen('state/revealResults', (results) => {
     if (results && currentState && myPlayerId) {
       renderResult(currentState.currentQuestion, results, currentState.scores);
