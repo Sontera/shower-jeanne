@@ -28,14 +28,14 @@ body {
 .lobby.active { display: flex; }
 
 .lobby h1 {
-  font-size: 3.2rem;
+  font-size: 4.5rem;
   font-weight: 800;
   color: var(--accent-dark);
   text-align: center;
 }
 
 .lobby-subtitle {
-  font-size: 1.4rem;
+  font-size: 1.8rem;
   color: var(--text-muted);
 }
 
@@ -83,24 +83,24 @@ body {
 }
 
 .round-label {
-  font-size: 1.6rem;
+  font-size: 2.4rem;
   font-weight: 700;
   color: var(--accent);
   text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-bottom: 16px;
-}
-
-.round-theme {
-  font-size: 3.2rem;
-  font-weight: 800;
-  color: var(--text);
-  line-height: 1.2;
+  letter-spacing: 3px;
   margin-bottom: 20px;
 }
 
+.round-theme {
+  font-size: 4.5rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.2;
+  margin-bottom: 24px;
+}
+
 .round-subtitle {
-  font-size: 1.3rem;
+  font-size: 1.8rem;
   color: var(--text-muted);
 }
 
@@ -150,22 +150,22 @@ body {
 }
 
 .question-number {
-  font-size: 1.2rem;
+  font-size: 1.6rem;
   font-weight: 800;
   color: var(--accent);
   white-space: nowrap;
 }
 
 .question-theme {
-  font-size: 1.05rem;
+  font-size: 1.4rem;
   color: var(--text-muted);
   font-style: italic;
 }
 
 .question-text {
-  font-size: 2.1rem;
+  font-size: 2.8rem;
   font-weight: 700;
-  line-height: 1.35;
+  line-height: 1.3;
   color: var(--text);
 }
 
@@ -181,8 +181,8 @@ body {
   background: var(--surface);
   border: 3px solid var(--border);
   border-radius: 16px;
-  padding: 20px 24px;
-  font-size: 1.35rem;
+  padding: 24px 28px;
+  font-size: 1.8rem;
   font-weight: 600;
   line-height: 1.4;
   transition: border-color 0.3s, background 0.3s, transform 0.2s;
@@ -210,7 +210,7 @@ body {
   border-left: 5px solid var(--accent);
   border-radius: 0 14px 14px 0;
   padding: 22px 26px;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   line-height: 1.6;
   color: var(--text);
   animation: fade-in 0.5s ease;
@@ -233,7 +233,7 @@ body {
 .scores-screen.active { display: flex; }
 
 .scores-screen h2 {
-  font-size: 2.6rem;
+  font-size: 3.5rem;
   font-weight: 800;
   color: var(--accent-dark);
 }
@@ -241,45 +241,54 @@ body {
 .scoreboard {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 20px;
   width: 100%;
-  max-width: 750px;
+  max-width: 1000px;
 }
 
 .score-row {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
   animation: slide-in-left 0.4s ease both;
 }
 
 .score-rank {
-  font-size: 1.5rem;
+  font-size: 2.6rem;
   font-weight: 800;
   color: var(--accent);
-  min-width: 44px;
+  min-width: 60px;
   text-align: center;
+}
+
+.score-row .player-token--admin {
+  --token-avatar-size: 64px;
+  --token-height: 64px;
+  --token-radius: 34px;
+  --token-font-size: 1.5rem;
+  padding-left: 18px;
+  gap: 12px;
 }
 
 .score-bar {
   flex: 1;
-  height: 14px;
+  height: 22px;
   background: var(--border);
-  border-radius: 7px;
+  border-radius: 11px;
   overflow: hidden;
 }
 
 .score-bar-fill {
   height: 100%;
-  border-radius: 7px;
+  border-radius: 11px;
   transition: width 0.8s ease;
 }
 
 .score-value {
-  font-size: 1.3rem;
+  font-size: 2.4rem;
   font-weight: 800;
   color: var(--text);
-  min-width: 44px;
+  min-width: 60px;
   text-align: right;
 }
 
@@ -299,7 +308,7 @@ body {
 .final-screen.active { display: flex; }
 
 .final-screen h2 {
-  font-size: 2.8rem;
+  font-size: 4rem;
   font-weight: 800;
   color: var(--accent-dark);
 }

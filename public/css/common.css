@@ -94,13 +94,13 @@ body {
   display: block;
 }
 
-/* --- Taille TV (1.5x, visible de loin) --- */
+/* --- Taille TV (gros, visible de loin) --- */
 .player-token--tv {
   --token-avatar-size: 88px;
   --token-height: 88px;
   --token-radius: 46px;
-  --token-font-size: 1.55rem;
-  padding-left: 22px;
+  --token-font-size: 1.85rem;
+  padding-left: 24px;
   gap: 14px;
   border-width: 3px;
 }

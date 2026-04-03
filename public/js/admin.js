@@ -18,8 +18,10 @@ const btnBack = document.getElementById('btn-back');
 const btnConnectAll = document.getElementById('btn-connect-all');
 const btnRandomVotes = document.getElementById('btn-random-votes');
 const btnReset = document.getElementById('btn-reset');
+const btnJeopardy = document.getElementById('btn-jeopardy');
 
 let _restoring = false;
+let _jeopardyAudio = null;
 
 // --- Sync engine → Firebase ---
 
@@ -334,6 +336,20 @@ btnBack.addEventListener('click', () => engine.goBack());
 btnConnectAll.addEventListener('click', connectAllPlayers);
 btnRandomVotes.addEventListener('click', simulateRandomVotes);
 btnReset.addEventListener('click', resetQuiz);
+btnJeopardy.addEventListener('click', () => {
+  if (_jeopardyAudio && !_jeopardyAudio.paused) {
+    _jeopardyAudio.pause();
+    _jeopardyAudio.currentTime = 0;
+    btnJeopardy.textContent = 'Jeopardy';
+    return;
+  }
+  _jeopardyAudio = new Audio('assets/jeopardy.mp3');
+  _jeopardyAudio.play();
+  btnJeopardy.textContent = 'Arrêter musique';
+  _jeopardyAudio.addEventListener('ended', () => {
+    btnJeopardy.textContent = 'Jeopardy';
+  });
+});
 
 // --- Boot ---
 

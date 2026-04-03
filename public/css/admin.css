@@ -102,14 +102,15 @@ h1 {
   cursor: not-allowed;
 }
 
-.btn-danger {
-  background: var(--wrong);
+.btn-reset {
+  background: #6b6b6b;
   color: white;
+  font-size: 0.85rem;
+  padding: 8px 16px;
 }
 
-.btn-danger:hover {
-  background: var(--wrong-light);
-  color: var(--wrong);
+.btn-reset:hover {
+  background: #4a4a4a;
 }
 
 /* Info question en cours */

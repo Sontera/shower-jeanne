@@ -36,7 +36,7 @@
     <!-- Outils de test -->
     <div class="controls" id="test-controls" style="margin-top:0;">
       <button class="btn btn-secondary" id="btn-random-votes" disabled>Simuler votes aléatoires</button>
-      <button class="btn btn-danger" id="btn-reset">Recommencer le quiz</button>
+      <button class="btn btn-secondary" id="btn-jeopardy">Jeopardy</button>
     </div>
 
     <!-- Question en cours -->
@@ -50,6 +50,10 @@
     <div class="vote-status" id="vote-status" style="display:none;">
       <h3>Votes (<span id="vote-count">0</span>/<span id="player-count">0</span>)</h3>
       <div id="vote-list"></div>
+
+      <div style="margin-top:16px;">
+        <button class="btn btn-reset" id="btn-reset">Recommencer le quiz</button>
+      </div>
     </div>
   </div>
 
