@@ -147,6 +147,17 @@ h1 {
   color: var(--text);
 }
 
+.current-question-info .q-choices-list {
+  margin-bottom: 12px;
+}
+
+.current-question-info .q-choices-list p {
+  font-size: 1.05rem;
+  font-weight: 600;
+  padding: 4px 0;
+  color: var(--text);
+}
+
 .current-question-info .q-answer {
   font-size: 1.15rem;
   color: var(--correct);
@@ -194,12 +205,30 @@ h1 {
   border-bottom: none;
 }
 
-.vote-choice {
-  font-weight: 600;
-  min-width: 30px;
+.vote-proxy-buttons {
+  display: flex;
+  gap: 6px;
 }
 
-.vote-pending {
-  color: var(--text-muted);
-  font-style: italic;
+.vote-proxy-btn {
+  width: 34px;
+  height: 34px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  font-family: var(--font);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.vote-proxy-btn:hover {
+  border-color: var(--accent);
+}
+
+.vote-proxy-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
 }

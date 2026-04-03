@@ -123,6 +123,14 @@ function renderQuestionInfo() {
     `Round ${q.round || '?'} — Question ${qInRound}/${roundTotal}`;
   document.getElementById('admin-q-text').textContent = q.text;
 
+  const choicesEl = document.getElementById('admin-q-choices');
+  choicesEl.innerHTML = '';
+  for (const choice of q.choices) {
+    const p = document.createElement('p');
+    p.textContent = choice;
+    choicesEl.appendChild(p);
+  }
+
   const correctChoice = q.choices.find(c => c.startsWith(q.answer + ')')) || q.answer;
   document.getElementById('admin-q-answer').textContent =
     `Bonne réponse : ${correctChoice}`;
@@ -132,8 +140,11 @@ function renderQuestionInfo() {
 function renderVoteStatus() {
   const votes = engine.votes;
   const connected = engine.connectedPlayers;
+  const q = engine.currentQuestion;
   const voteList = document.getElementById('vote-list');
   voteList.innerHTML = '';
+
+  const letters = q ? q.choices.map(c => c.charAt(0)) : ['A', 'B', 'C', 'D'];
 
   let count = 0;
   for (const playerId of connected) {
@@ -146,19 +157,25 @@ function renderVoteStatus() {
     const nameSpan = document.createElement('span');
     nameSpan.textContent = player.name;
 
-    const voteSpan = document.createElement('span');
     const vote = votes[playerId];
-    if (vote != null) {
-      voteSpan.className = 'vote-choice';
-      voteSpan.textContent = vote;
-      count++;
-    } else {
-      voteSpan.className = 'vote-pending';
-      voteSpan.textContent = 'en attente...';
+    if (vote != null) count++;
+
+    // Boutons pour voter à la place du joueur
+    const btnsWrap = document.createElement('span');
+    btnsWrap.className = 'vote-proxy-buttons';
+    for (const letter of letters) {
+      const btn = document.createElement('button');
+      btn.className = 'vote-proxy-btn' + (vote === letter ? ' active' : '');
+      btn.textContent = letter;
+      btn.addEventListener('click', async () => {
+        await dbSet(`votes/${playerId}`, letter);
+        engine.castVote(playerId, letter);
+      });
+      btnsWrap.appendChild(btn);
     }
 
     row.appendChild(nameSpan);
-    row.appendChild(voteSpan);
+    row.appendChild(btnsWrap);
     voteList.appendChild(row);
   }
 

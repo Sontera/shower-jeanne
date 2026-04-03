@@ -150,6 +150,18 @@ function renderReveal(questionIndex, results) {
       const player = getPlayerById(playerId);
       if (!tokenEl || !player) continue;
       updateTokenMood(tokenEl, player, result.correct ? 'happy' : 'sad');
+
+      // Afficher le choix du joueur à côté de son nom
+      let badge = tokenEl.querySelector('.token-vote-badge');
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'token-vote-badge';
+        tokenEl.insertBefore(badge, tokenEl.querySelector('.token-avatar'));
+      }
+      const voteText = result.vote || '—';
+      badge.textContent = voteText;
+      badge.classList.toggle('badge-correct', result.correct);
+      badge.classList.toggle('badge-wrong', !result.correct);
     }
   }
 }

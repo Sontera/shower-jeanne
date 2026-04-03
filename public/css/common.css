@@ -167,6 +167,37 @@ body {
   color: #a02020;
 }
 
+/* Badge du choix de réponse (affiché au reveal) */
+.token-vote-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  padding: 0 6px;
+  flex-shrink: 0;
+}
+
+.player-token--tv .token-vote-badge {
+  min-width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  font-size: 1.5rem;
+}
+
+.token-vote-badge.badge-correct {
+  background: var(--correct);
+  color: white;
+}
+
+.token-vote-badge.badge-wrong {
+  background: var(--wrong);
+  color: white;
+}
+
 /* A voté (attente de révélation) */
 .player-token[data-voted="true"]::after {
   content: '';
